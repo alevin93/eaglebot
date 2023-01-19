@@ -1,6 +1,5 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
-const gangInfoFile = require("./gangInfo.json");
 const cron = require("node-cron");
 require("dotenv/config");
 
@@ -16,6 +15,8 @@ client.on("ready", () => {
   console.log("FloppaBot Activated");
 });
 
+const gangInfoFile = require("./gangInfo.json");
+
 var startingAmount = 1;
 var splitFlag = false;
 var participants = [];
@@ -23,7 +24,7 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 //-------------- CRON JOBS ------------- //
-cron.schedule("*/4 * * * *", () => {
+cron.schedule("*/1 * * * *", () => {
   writeGangInfo();
 });
 
@@ -46,6 +47,7 @@ client.on("messageCreate", (message) => {
     gangEmbed(message);
   }
 });
+
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
   const formatter = new Intl.NumberFormat("en-US", {
@@ -54,33 +56,26 @@ const gangEmbed = (message) => {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   });
+  console.log(gangInfoFile.bank)
   const statsEmbed = new EmbedBuilder()
     .setTitle("Comp Or Ban")
-    .setThumbnail(
-      "https://i.imgur.com/BHLmQck.jpeg"
-    )
+    .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
     .setURL("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
     .addFields(
-      {
-        name: "Gang Funds",
-        value: formatter.format(gangInfoFile.bank),
-        inline: true,
-      },
+      { name: "Gang Funds", value: `${formatter.format(gangInfoFile.bank)}`, inline: true },
       {
         name: "War Kills",
-        value: gangInfoFile.kills,
+        value: `${gangInfoFile.kills}`,
         inline: true,
       },
       {
         name: "War Deaths",
-        value: gangInfoFile.deaths,
+        value: `${gangInfoFile.deaths}`,
         inline: true,
       }
     )
-    .setFooter({ text: "The iron mines must be protected"});
-    message.channel.send({ embeds: [statsEmbed] });
-    //hopefully this works????
-
+    .setFooter({ text: "The iron mines must be protected" });
+  message.channel.send({ embeds: [statsEmbed] });
 };
 
 //----------- HELP FUNCTION ------------ //
