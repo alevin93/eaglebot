@@ -24,7 +24,7 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 //-------------- CRON JOBS ------------- //
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("*/4 * * * *", () => {
   writeGangInfo();
 });
 
