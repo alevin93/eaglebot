@@ -1,4 +1,10 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  User,
+  ReactionCollector,
+} = require("discord.js");
 const fs = require("fs");
 const cron = require("node-cron");
 require("dotenv/config");
@@ -17,7 +23,7 @@ client.on("ready", () => {
 
 const gangInfoFile = require("./gangInfo.json");
 
-var startingAmount = 1;
+var startingAmt = 1;
 var splitFlag = false;
 var participants = [];
 var gangMemberLink =
@@ -46,6 +52,12 @@ client.on("messageCreate", (message) => {
   if (message.content === "!gang") {
     gangEmbed(message);
   }
+  if (message.content === "!startcap") {
+    startCartel(message);
+  }
+  if (message.content === "!endcap") {
+    endCartel(message);
+  }
 });
 
 //----------- GANG FUNCTION ------------ //
@@ -56,13 +68,17 @@ const gangEmbed = (message) => {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   });
-  console.log(gangInfoFile.bank)
+  console.log(gangInfoFile.bank);
   const statsEmbed = new EmbedBuilder()
     .setTitle("Comp Or Ban")
     .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
     .setURL("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
     .addFields(
-      { name: "Gang Funds", value: `${formatter.format(gangInfoFile.bank)}`, inline: true },
+      {
+        name: "Gang Funds",
+        value: `${formatter.format(gangInfoFile.bank)}`,
+        inline: true,
+      },
       {
         name: "War Kills",
         value: `${gangInfoFile.kills}`,
@@ -108,6 +124,42 @@ const helpMessage = (message) => {
       text: "Please submit bug reports to Nman#3327 on discord, or tag @FloppaDev",
     });
   message.author.send({ embeds: [helpEmbed] });
+};
+
+//----------- Cartel Split Function --------//
+
+const startCartel = async (message) => {
+  startingAmt = gangInfoFile.bank;
+  message.channel.send(
+    "Starting cartels at $" + startingAmt + " react if participating."
+  );
+  message.react("👍");
+
+  client.on("messageReactionAdd", (reaction, user) => {
+    participants.push(`${user}`);
+  });
+  const filter = (reaction, user) => {
+    return ["👍"].includes(reaction.emoji.name);
+  };
+  message
+    .awaitReactions(filter, { max: 100, time: 900000 })
+    .then((collected) => {
+      console.log(participants);
+    })
+    .catch((collected) => {
+      console.log("Error during caps split function");
+    });
+};
+
+const endCartel = async (message) => {
+  const endingAmt = gangInfoFile.bank;
+  message.channel.send(
+    "Split from cartels is $" +
+      Math.round(((endingAmt - startingAmt) *.9) / (participants.length - 1)) +
+      " each"
+  );
+  startingAmt = 1;
+  participants = [];
 };
 
 // ---------- GET CAPS FUNCTION ---------- //
