@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const gangInfoFile = require("./gangInfo.json");
-const cron = require('node-cron');
+const cron = require("node-cron");
 require("dotenv/config");
 
 const client = new Client({
@@ -42,7 +42,43 @@ client.on("messageCreate", (message) => {
   if (message.content === "!help") {
     helpMessage(message);
   }
+  if (message.content === "!gang") {
+    gangEmbed(message);
+  }
 });
+//----------- GANG FUNCTION ------------ //
+const gangEmbed = (message) => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  });
+  const statsEmbed = new EmbedBuilder()
+    .setTitle("Comp Or Ban")
+    .setThumbnail(
+      "https://i.imgur.com/BHLmQck.jpeg"
+    )
+    .setUrl("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
+    .addFields(
+      {
+        name: "Gang Funds",
+        value: formatter.format(gangInfoFile.bank),
+        inline: true,
+      },
+      {
+        name: "War Kills",
+        value: gangInfoFile.kills,
+        inline: true,
+      },
+      {
+        name: "War Deaths",
+        value: gangInfoFile.deaths,
+        inline: true,
+      }
+    )
+    .setFooter("The iron mines must be protected");
+};
 
 //----------- HELP FUNCTION ------------ //
 const helpMessage = (message) => {
@@ -199,11 +235,8 @@ const writeGangMemberInfo = async () => {
   }
 };
 
-const archiveStats = () => {
-
-}
+const archiveStats = () => {};
 
 // ----------- IRON TAX FUNC ------------- //
-
 
 client.login(process.env.TOKEN);
