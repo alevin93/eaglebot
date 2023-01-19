@@ -77,7 +77,10 @@ const gangEmbed = (message) => {
         inline: true,
       }
     )
-    .setFooter("The iron mines must be protected");
+    .setFooter({ text: "The iron mines must be protected"});
+    message.channel.send({ embeds: [statsEmbed] });
+    //hopefully this works????
+
 };
 
 //----------- HELP FUNCTION ------------ //
