@@ -59,7 +59,7 @@ const gangEmbed = (message) => {
     .setThumbnail(
       "https://i.imgur.com/BHLmQck.jpeg"
     )
-    .setUrl("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
+    .setURL("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
     .addFields(
       {
         name: "Gang Funds",
