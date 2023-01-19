@@ -15,8 +15,11 @@ client.on("ready", () => {
   console.log("FloppaBot Activated");
 });
 
-const gangInfoFile = require("./gangInfo.json");
+var gangInfoFile = require("./gangInfo.json");
+var gangMemberFile = require('./gangMembers.json');
+const leaders = require('./weeklyLeaders.json');
 
+var weekCounter = 1;
 var startingAmount = 1;
 var splitFlag = false;
 var participants = [];
@@ -24,13 +27,21 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 //-------------- CRON JOBS ------------- //
-cron.schedule("*/4 * * * *", () => {
-  writeGangInfo();
-});
+// cron.schedule("30 */5 * * * * *", () => {
+//   archiveStats();
+// })
 
-cron.schedule("*/10 * * * * ", () => {
-  writeGangMemberInfo();
-});
+// cron.schedule("45 */10 * * * * *", () => {
+//   recordWeekStats();
+// })
+
+// cron.schedule("1 */5 * * * *", () => {
+//   writeGangInfo();
+// });
+
+// cron.schedule("10 */5 * * * * ", () => {
+//   writeGangMemberInfo();
+// });
 
 // ---------- MAIN FUNCTION ----------- //
 client.on("messageCreate", (message) => {
@@ -45,6 +56,16 @@ client.on("messageCreate", (message) => {
   }
   if (message.content === "!gang") {
     gangEmbed(message);
+  }
+  if (message.content === "!fetch"){
+    writeGangMemberInfo();
+  }
+  if (message.content === "!record"){
+    archiveStats();
+  }
+  if (message.content === "!stats") {
+    weekCounter = 2;
+    recordWeekStats();
   }
 });
 
@@ -192,11 +213,12 @@ const writeGangInfo = async () => {
         console.log("gangInfo.json updated");
       }
     );
+    let gangInfoFile = require('./gangInfo.json');
   });
 };
 
 const writeGangMemberInfo = async () => {
-  try {
+
     let members = gangInfoFile.members;
 
     gangMemberLink = gangMemberLink + members[0].player_id;
@@ -227,14 +249,110 @@ const writeGangMemberInfo = async () => {
           console.log("gangMembers.json updated");
         }
       );
+      let gangMemberFile = require("./gangMembers.json");
     });
-  } catch (err) {
-    console.log("Error Writing gangMembers.json:  \n    " + err);
+};
+
+const archiveStats = () => {
+  fs.writeFile(
+    `./archive/${weekCounter}.json`,
+    JSON.stringify(gangMemberFile),
+    'utf8',
+    function (err) {
+      if (err) {
+        console.log(
+          "An Error occured while archiving documents"
+        );
+        return console.log(err);
+      }
+      console.log("Archive file updated");
+    }
+  )
+  if(weekCounter === 52) {
+    weekCounter = 1;
+  } else {
+    weekCounter++;
   }
 };
 
-const archiveStats = () => {};
+// ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
-// ----------- IRON TAX FUNC ------------- //
+const recordWeekStats = () => {
+  var data;
+  let skip = [2000];
+  let offset = 0;
+  if(weekCounter === 1) {
+    let data = require(`./archive/52.json"}`);
+  } else {
+    let data = require(`./archive/1.json`);
+  }
+
+  json = data;
+  console.log(json);
+
+  for(let i = 0; i < gangMemberFile.length; i++) {
+    
+    if(skip.includes(i)) { continue; }  // If i has been added to skip array (already counted that player), skip iteration
+
+    
+
+    if(json[i+offset].player_id === gangMemberFile[i].player_id) {
+
+      let wkills = gangMemberFile[i].kills - json[i+offset].kills;
+      let wdeaths = gangMemberFile[i].deaths - json[i+offset].deaths;
+      let wprison = gangMemberFile[i].stats.prison_time - json[i+offset].stats.prison_time;
+      let wrobbed = gangMemberFile[i].stats.players_robbed - json[i+offset].stats.players_robbed;
+
+      for (let j = 0; j < gangMembers.length; j++) {
+        if(gangMemberFile[j].name === gangMemberFile[i].name && gangMemberFile[j].player_id !== gangMemberFile[i].player_id) {
+          let wkills =  wkills + (gangMemberFile[j].kills - json[j+offset].kills);
+          let wdeaths = wdeaths + (gangMemberFile[j].deaths - json[j+offset].deaths);
+          let wprison = wprison + (gangMemberFile[j].stats.prison_time - json[j+offset].stats.prison_time);
+          let wrobbed = wrobbed + (gangMemberFile[j].stats.players_robbed - json[j+offset].stats.players_robbed);
+
+          skip.push(j);
+        }
+      }
+
+      if(leaders.kills.value < wkills) {
+        leaders.kills.name = gangMemberFile[i].name;
+        leaders.kills.value = wkills
+        if(leaders.kills.record < wkills) {
+          leaders.kills.record = wkills;
+          leaders.kills.holder = gangMemberFile[i].name;
+        }
+      }
+      if(leaders.deaths.value < wdeaths) {
+        leaders.deaths.name = gangMemberFile[i].name;
+        leaders.deaths.value = wdeaths
+        if(leaders.deaths.record < wdeaths) {
+          leaders.deaths.record = wdeaths;
+          leaders.deaths.holder = gangMemberFile[i].name;
+        }
+      }
+      if(leaders.prison.value < wprison) {
+        leaders.prison.name = gangMemberFile[i].name;
+        leaders.prison.value = wprison;
+        if(leaders.prison.record < wprison) {
+          leaders.prison.record = wprison;
+          leaders.prison.holder = gangMemberFile[i].name;
+        }
+      }
+      if(leaders.robbed.value < (gangMemberFile[i].kills - json[i+offset].kills)) {
+        leaders.robbed.name = gangMemberFile[i].name;
+        leaders.robbed.value = wrobbed;
+        if(leaders.robbed.record < wrobbed) {
+          leaders.robbed.record = wrobbed;
+          leaders.robbed.holder = gangMemberFile[i].name;
+        }
+      }
+    } else {
+      offset++;
+      i--;
+    }
+  }
+  console.log("Leaders Updated!");
+}
+
 
 client.login(process.env.TOKEN);

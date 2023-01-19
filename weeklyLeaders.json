@@ -1,0 +1,26 @@
+{
+    "kills": {
+        "name": "",
+        "value": 0,
+        "record": 0,
+        "holder": ""
+    },
+    "deaths": {
+        "name": "",
+        "value": 0,
+        "record": 0,
+        "holder": ""
+    },
+    "prison": {
+        "name": "",
+        "value": 0,
+        "record": 0,
+        "holder": ""
+    },
+    "robbed": {
+        "name": "",
+        "value": 0,
+        "record": 0,
+        "holder": ""
+    }
+}
