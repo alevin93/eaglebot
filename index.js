@@ -18,9 +18,16 @@ client.on("ready", () => {
 var gangInfoFile = require("./gangInfo.json");
 var gangMemberFile = require('./gangMembers.json');
 var leadersFile = require('./weeklyLeaders.json');
-var ironLedger = require('./ironLedger.json');
 
-var weekCounter = 1;
+const formatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+  minimumFractionDigits: 0,
+});
+
+var weekCounter = 2;
+const prefix = "!";
 var gmUpdated = null;
 var startingAmount = 1;
 var splitFlag = false;
@@ -47,38 +54,54 @@ var gangMemberLink =
 
 // ---------- MAIN FUNCTION ----------- //
 client.on("messageCreate", (message) => {
-  if (message.content === "!caps") {
+
+  const args = message.content.slice(prefix.length).split("/ +/");
+  const temp = args.shift().toLowerCase();
+  const command = temp.split(" ")
+
+  if (command[0] === "check") {
+    console.log(message.author);
+  }
+  if (command[0] === "caps") {
     getCaps(message);
   }
-  if (message.content === "!floppa") {
+  if (command[0] === "floppa") {
     floppaImg(message);
   }
-  if (message.content === "!help") {
+  if (command[0] === "help") {
     helpMessage(message);
   }
-  if (message.content === "!gang") {
+  if (command[0] === "gang") {
     gangEmbed(message);
   }
-  if (message.content === "!stats") {
+  if (command[0] === "stats") {
+    recordWeekStats();
     getWeeklyStats(message);
   }
-  if (message.content === "!fetch"){
+  if (command[0] === "startcap") {
+    startCartel(message);
+  }
+  if (command[0] === "endcap") {
+    endCartel(message);
+  }
+  if (command[0] === "iron") {
+    if(command[1]) {
+      checkMemberLedger(message, command[1]);
+    }
+    else {
+      checkIronLedger(message);
+    }
+  }
+  if (command[0] === "fetch"){
     writeGangMemberInfo();
   }
-  if (message.content === "!record"){
-    archiveStats();
-  }
+  // if (command[0] === "record"){
+  //   archiveStats();
+  // }
 });
 
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
-  const formatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  });
-  console.log(gangInfoFile.bank)
   const statsEmbed = new EmbedBuilder()
     .setTitle("Comp Or Ban")
     .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
@@ -134,7 +157,7 @@ const helpMessage = (message) => {
 
 // --------- POST STATS FUNCTIONS ---------//
 
-const getWeeklyStats = async (message) => {
+const getWeeklyStats = (message) => {
   json = leadersFile;
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle("Daily Stats")
@@ -155,8 +178,9 @@ const getWeeklyStats = async (message) => {
         name: "Highest Daily Robbed Players",
         value: `${json.robbed.name + ": " + json.robbed.value + " players robbed \n"}`
       }
-    ).setFooter({
-      text: `${gmUpdated}`,
+    )
+    .setFooter({
+      text: `Last Update: ${currentDate(2)}`,
     });
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
@@ -307,12 +331,101 @@ const archiveStats = () => {
   }
 };
 
+//----------- Cartel Split Function --------//
+
+const startCartel = async (message) => {
+  startingAmt = gangInfoFile.bank;
+  message.channel.send(
+    "Starting cartels at $" + startingAmt + " react if participating."
+  );
+  message.react("👍");
+
+  client.on("messageReactionAdd", (reaction, user) => {
+    participants.push(`${user}`);
+  });
+  const filter = (reaction, user) => {
+    return ["👍"].includes(reaction.emoji.name);
+  };
+  message
+    .awaitReactions(filter, { max: 100, time: 900000 })
+    .then((collected) => {
+      console.log(participants);
+    })
+    .catch((collected) => {
+      console.log("Error during caps split function");
+    });
+};
+
+const endCartel = async (message) => {
+  const endingAmt = gangInfoFile.bank;
+  message.channel.send(
+    "Split from cartels is $" +
+      Math.round(((endingAmt - startingAmt) *.9) / (participants.length - 1)) +
+      " each"
+  );
+  startingAmt = 1;
+  participants = [];
+};
+
+// ----------- IRON CHAT COMMANDS ------------------ //
+
+const checkIronLedger = (message) => {
+  var ironLedger = require('./ironLedger.json');
+  var fields = [];
+  for(let i = 0; i < ironLedger.length; i++) {
+    fields[i] =
+      {
+        name: `${ironLedger[i].name}`,
+        value: `${formatter.format(ironLedger[i].total_owed)}`,
+      }
+  }
+  const ironEmbed = new EmbedBuilder()
+      .setTitle("Iron Ledger")
+      .addFields(fields);
+    message.channel.send({ embeds: [ironEmbed] });
+}
+
+const checkMemberLedger = (message, name) => {
+  var ironLedger = require('./ironLedger.json');
+  var transactions = "";
+  
+  for(let i = 0; i < ironLedger.length; i++) {
+    if(ironLedger[i].name.toLowerCase() === name) {
+      for(let j = 0; j < ironLedger[i].transactions.length; j++) {
+        transactions = transactions + ironLedger[i].transactions[j] + "\n"
+      }
+      const ironEmbed = new EmbedBuilder()
+      .setTitle(`${ironLedger[i].name}'s Ledger`)
+      .addFields(
+        {
+          name: "Name",
+          value: `${ironLedger[i].name}`
+        },
+        {
+          name: "Total Owed",
+          value: `${formatter.format(ironLedger[i].total_owed)}`
+        },
+        {
+          name: "Transactions",
+          value: `${transactions}`
+        }
+      )
+      .setFooter({
+        text: `Last Update: ${currentDate(2)}`,
+      });
+      message.channel.send({ embeds: [ironEmbed] });
+    }
+  }
+  
+}
+
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
 const recordWeekStats = () => {
+  console.log(weekCounter);
   var data = require(`./archive/${weekCounter-1}.json`);
+  var ironLedger = require('./ironLedger');
   let skip = [2000];
-  let ironLedger = {};
   let offset = 0;
   leaders = leadersFile;
   if(weekCounter === 1) {
@@ -321,14 +434,11 @@ const recordWeekStats = () => {
 
   json = data;
 
-  console.log(leaders.kills);
-  console.log(json[0].player_id);
-
   for(let i = 0; i < gangMemberFile.length; i++) {
     
     if(skip.includes(i)) { continue; }  // If i has been added to skip array (already counted that player), skip iteration
 
-    if(json[(i+offset)].player_id === gangMemberFile[i].player_id) {
+    if(json[(i+offset)]?.player_id === gangMemberFile[i].player_id) {
 
       let wkills = gangMemberFile[i].kills - json[i+offset].kills;
       let wdeaths = gangMemberFile[i].deaths - json[i+offset].deaths;
@@ -352,14 +462,34 @@ const recordWeekStats = () => {
       }
 
       if(ironSold > 0) {
-        let ironFile = {
-          name: gangMemberFile[i].name,
-          player_id: gangMemberFile[i].player_id,
-          iron_sold: ironSold,
-          value: ironSold * 1900,
-          total_owed: 0,
+        const taxAmount = 1900;
+        let ironFlag = false;
+        for(let j = 0; j < ironLedger.length; j++) {
+          if(ironLedger[j]?.player_id === gangMemberFile[i].player_id) {
+            ironFlag = true;
 
+            ironLedger[j].value = ironSold * taxAmount; 
+            ironLedger[j].iron_sold = ironSold; 
+            ironLedger[j].total_owed = ironLedger[j].total_owed + (ironSold * taxAmount);
+            ironLedger[j].transactions.push(`[${currentDate(1)}] Sold ${ironSold}. Tax added: ${formatter.format(ironSold * taxAmount)}.  Total: ${formatter.format(ironLedger[j].total_owed)}`)
+          }
         }
+        if(!ironFlag) {
+          let ironFile = {
+            player_id: gangMemberFile[i].player_id,
+            name: gangMemberFile[i].name,
+            iron_sold: ironSold,
+            value: ironSold * taxAmount,
+            total_owed: ironSold * taxAmount,
+            transactions: [
+              `[${currentDate(1)}] Sold ${ironSold}. Tax added: ${formatter.format(ironSold * taxAmount)}.  Total: ${formatter.format(ironSold * taxAmount)}`,
+              ]
+          }
+          ironLedger[ironLedger.length] = ironFile;
+        }
+
+        console.log(ironLedger);
+
       }
 
       if(leaders.kills.value < wkills) {
@@ -394,45 +524,74 @@ const recordWeekStats = () => {
           leaders.robbed.holder = gangMemberFile[i].name;
         }
       }
-      fs.writeFile(
-        `./weeklyLeaders.json`,
-        JSON.stringify(leaders),
-        'utf8',
-        function (err) {
-          if (err) {
-            console.log(
-              "An Error occured while writing leaders file"
-            );
-            return console.log(err);
-          }
-        }
-      )
-
     } else {
       offset++;
       i--;
     }
   }
+  fs.writeFile(
+    `./weeklyLeaders.json`,
+    JSON.stringify(leaders),
+    'utf8',
+    function (err) {
+      if (err) {
+        console.log(
+          "An Error occured while writing leaders file\n      "
+        );
+        return console.log(err);
+      }
+    }
+  )
+  fs.writeFile(
+    `./ironLedger.json`,
+    JSON.stringify(ironLedger),
+    'utf8',
+    function (err) {
+      if (err) {
+        console.log(
+          "An Error occured while writing iron ledger file\n      "
+        );
+        return console.log(err);
+      }
+    }
+  )
+
   console.log("Leaders Updated!");
 }
 
 
 // ----------------- SUPPLIMENTAL FUNCTIONS --------- //
 
-const currentDate = () => {
-  var currentdate = new Date();
-      var currentHour = currentdate.getHours();
-      if (currentHour === 0) {
-        currentHour = 12;
-      }
-      else if ( currentHour > 12) {
-        currentHour = currentHour - 12;
-      }
-      var date = "Last Update: " + (currentdate.getMonth()+1) + "/"
-                + currentdate.getDate()  + " at "
-                + currentHour + ":"  
-                + currentdate.getMinutes();
-      return date;
+const currentDate = (num) => {
+  if(num === 2) {
+    var currentdate = new Date();
+        var currentHour = currentdate.getHours();
+        if (currentHour === 0) {
+          currentHour = 12;
+        }
+        else if ( currentHour > 12) {
+          currentHour = currentHour - 12;
+        }
+        var date = (currentdate.getMonth()+1) + "/"
+                  + currentdate.getDate()  + " at "
+                  + currentHour + ":"  
+                  + currentdate.getMinutes();
+        return date;
+  }
+  if(num === 1) {
+    var currentdate = new Date();
+        var currentHour = currentdate.getHours();
+        if (currentHour === 0) {
+          currentHour = 12;
+        }
+        else if ( currentHour > 12) {
+          currentHour = currentHour - 12;
+        }
+        var date = (currentdate.getMonth()+1) + "/"
+                  + currentdate.getDate() + "/" 
+                  + currentdate.getYear();
+        return date;
+  }
 }
 
 client.login(process.env.TOKEN);

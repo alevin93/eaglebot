@@ -1,1 +1,50 @@
-{}
+[
+  {
+    "player_id": "76561198038047063",
+    "name": "Mayo7.62",
+    "iron_sold": 923,
+    "value": 1753700,
+    "total_owed": 5261100,
+    "transactions": [
+      "[1/20/123] Sold 923. Tax added: $1,753,700.  Total: $1,753,700",
+      "[1/20/123] Sold 923. Tax added: $1,753,700.  Total: $3,507,400",
+      "[1/20/123] Sold 923. Tax added: $1,753,700.  Total: $5,261,100"
+    ]
+  },
+  {
+    "player_id": "76561198084286154",
+    "name": "KudosTV",
+    "iron_sold": 118,
+    "value": 224200,
+    "total_owed": 672600,
+    "transactions": [
+      "[1/20/123] Sold 118. Tax added: $224,200.  Total: $224,200",
+      "[1/20/123] Sold 118. Tax added: $224,200.  Total: $448,400",
+      "[1/20/123] Sold 118. Tax added: $224,200.  Total: $672,600"
+    ]
+  },
+  {
+    "player_id": "76561198152914674",
+    "name": "Tommy Shelby",
+    "iron_sold": 73,
+    "value": 138700,
+    "total_owed": 416100,
+    "transactions": [
+      "[1/20/123] Sold 73. Tax added: $138,700.  Total: $138,700",
+      "[1/20/123] Sold 73. Tax added: $138,700.  Total: $277,400",
+      "[1/20/123] Sold 73. Tax added: $138,700.  Total: $416,100"
+    ]
+  },
+  {
+    "player_id": "76561198352972077",
+    "name": "TEH",
+    "iron_sold": 1051,
+    "value": 1996900,
+    "total_owed": 5990700,
+    "transactions": [
+      "[1/20/123] Sold 1051. Tax added: $1,996,900.  Total: $1,996,900",
+      "[1/20/123] Sold 1051. Tax added: $1,996,900.  Total: $3,993,800",
+      "[1/20/123] Sold 1051. Tax added: $1,996,900.  Total: $5,990,700"
+    ]
+  }
+]
