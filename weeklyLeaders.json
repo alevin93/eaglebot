@@ -1,26 +1,26 @@
 {
     "kills": {
-        "name": "",
-        "value": 0,
-        "record": 0,
-        "holder": ""
+        "name": "KudosTV",
+        "value": 17,
+        "record": 17,
+        "holder": "KudosTV"
     },
     "deaths": {
-        "name": "",
-        "value": 0,
-        "record": 0,
-        "holder": ""
+        "name": "COLT45",
+        "value": 10,
+        "record": 10,
+        "holder": "COLT45"
     },
     "prison": {
-        "name": "",
-        "value": 0,
-        "record": 0,
-        "holder": ""
+        "name": "MBPslyr",
+        "value": 18,
+        "record": 18,
+        "holder": "MBPslyr"
     },
     "robbed": {
-        "name": "",
+        "name": "FAIL RP DONT CRY",
         "value": 0,
-        "record": 0,
-        "holder": ""
+        "record": 1,
+        "holder": "Darkness"
     }
 }
