@@ -1,1 +1,26 @@
-{"kills":{"name":"KudosTV","value":38,"record":38,"holder":"KudosTV"},"deaths":{"name":"Zombie Mall Cop","value":27,"record":27,"holder":"Zombie Mall Cop"},"prison":{"name":"not jailbait","value":25,"record":25,"holder":"not jailbait"},"robbed":{"name":"not jailbait","value":0,"record":1,"holder":"Darkness"}}
+{
+    "kills": {
+        "name": "KudosTV",
+        "value": 38,
+        "record": 38,
+        "holder": "KudosTV"
+    },
+    "deaths": {
+        "name": "Zombie Mall Cop",
+        "value": 27,
+        "record": 27,
+        "holder": "Zombie Mall Cop"
+    },
+    "prison": {
+        "name": "not jailbait",
+        "value": 25,
+        "record": 25,
+        "holder": "not jailbait"
+    },
+    "robbed": {
+        "name": "not jailbait",
+        "value": 0,
+        "record": 1,
+        "holder": "Darkness"
+    }
+}

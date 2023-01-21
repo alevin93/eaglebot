@@ -559,6 +559,21 @@ const recordWeekStats = () => {
   console.log("Leaders Updated!");
 }
 
+const calculateStatistics = (tracked, before, after) => {
+  var output = [];
+  for(let j = 0; j < after.length; j++) {
+    for(let k = 0; k < before.length; k++) {
+      if(after[j].player_id === before[k].player_id) {
+        output[j].name = after[j].name;
+        for(let i = 0; i < tracked.length; i++) {
+          output[j].name[tracked] = after[j][tracked[i]] - before[k]
+        }
+      }
+    }
+  }
+}
+
+//const compareLeaders = (statistic, player, )
 
 // ----------------- SUPPLIMENTAL FUNCTIONS --------- //
 
