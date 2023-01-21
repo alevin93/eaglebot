@@ -92,6 +92,9 @@ client.on("messageCreate", (message) => {
       checkIronLedger(message);
     }
   }
+  if (command[0] === "test") {
+    testFunction();
+  }
   if (command[0] === "fetch"){
     writeGangMemberInfo();
   }
@@ -564,13 +567,31 @@ const calculateStatistics = (tracked, before, after) => {
   for(let j = 0; j < after.length; j++) {
     for(let k = 0; k < before.length; k++) {
       if(after[j].player_id === before[k].player_id) {
-        output[j].name = after[j].name;
+        output[j] = {
+          'name': `${after[j].name}`,
+          'player_id': `${after[j].player_id}`,
+          'data': []
+        };
         for(let i = 0; i < tracked.length; i++) {
-          output[j].name[tracked] = after[j][tracked[i]] - before[k]
+          output[j].data.push(after[j][tracked[i]]? 
+            after[j][tracked[i]] - before[k][tracked[i]]:
+            after[j].stats[tracked[i]] - before[k].stats[tracked[i]]
+            );
+          console.log(`${after[j][tracked[i]]} - ${before[k][tracked[i]]} = ${after[j][tracked[i]] - before[k][tracked[i]]}`);
         }
       }
     }
   }
+  return output;
+}
+
+const testFunction = () => {
+  const before = require('./archive/1.json');
+  const after = require('./gangMembers.json');
+  const tracked = require('./trackedStats.json');
+
+  results = calculateStatistics(tracked, before, after);
+  console.log(results);
 }
 
 //const compareLeaders = (statistic, player, )
