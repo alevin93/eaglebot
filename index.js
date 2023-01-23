@@ -26,6 +26,7 @@ const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
 });
 
+slayer_id = '209141852849307649';
 var weekCounter = 2;
 const prefix = "!";
 var gmUpdated = null;
@@ -75,7 +76,6 @@ client.on("messageCreate", (message) => {
     gangEmbed(message);
   }
   if (command[0] === "stats") {
-    recordWeekStats();
     getWeeklyStats(message);
   }
   if (command[0] === "startcap") {
@@ -96,6 +96,7 @@ client.on("messageCreate", (message) => {
     testFunction();
   }
   if (command[0] === "fetch"){
+    writeGangInfo();
     writeGangMemberInfo();
   }
   // if (command[0] === "record"){
@@ -105,6 +106,7 @@ client.on("messageCreate", (message) => {
 
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
+  gangInfoFile = require('./gangInfo.json');
   const statsEmbed = new EmbedBuilder()
     .setTitle("Comp Or Ban")
     .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
@@ -161,27 +163,21 @@ const helpMessage = (message) => {
 // --------- POST STATS FUNCTIONS ---------//
 
 const getWeeklyStats = (message) => {
-  json = leadersFile;
+  json = require('./weeklyLeaders.json');
+  tracked = require('./trackedStats.json');
+  //building fields
+  fields = []
+  for(let i = 0; i < tracked.length; i++) {
+    fields[i] = {
+      name: `${tracked[i].toUpperCase()}`,
+      value: `Week: ${json[tracked[i]].name} - ${json[tracked[i]].value} \n
+              Record: ${json[tracked[i]].holder} - ${json[tracked[i]].record}`
+    }
+  }
+  console.log(fields);
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle("Daily Stats")
-    .addFields(
-      {
-        name: ":gun:Highest Daily Kills:gun:",
-        value: `${json.kills.name + ": " + json.kills.value + " kills \n"}`
-      },
-      {
-        name: ":skull:Highest Daily Deaths:skull:",
-        value: `${json.deaths.name + ": " + json.deaths.value + " deaths \n"}`
-      },
-      {
-        name: "Highest Daily Prison Time",
-        value: `${json.prison.name + ": " + json.prison.value + " minutes \n"}`
-      },
-      {
-        name: "Highest Daily Robbed Players",
-        value: `${json.robbed.name + ": " + json.robbed.value + " players robbed \n"}`
-      }
-    )
+    .addFields(fields)
     .setFooter({
       text: `Last Update: ${currentDate(2)}`,
     });
@@ -424,6 +420,13 @@ const checkMemberLedger = (message, name) => {
 
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
+const recordDailyStats = () => {
+  var oldData = require(`./archive/${weekCounter-1}.json`);
+  var newData = require('./gangMembers.json');
+
+
+}
+
 const recordWeekStats = () => {
   console.log(weekCounter);
   var data = require(`./archive/${weekCounter-1}.json`);
@@ -465,7 +468,7 @@ const recordWeekStats = () => {
       }
 
       if(ironSold > 0) {
-        const taxAmount = 1900;
+        const taxAmount = 175;
         let ironFlag = false;
         for(let j = 0; j < ironLedger.length; j++) {
           if(ironLedger[j]?.player_id === gangMemberFile[i].player_id) {
@@ -570,31 +573,84 @@ const calculateStatistics = (tracked, before, after) => {
         output[j] = {
           'name': `${after[j].name}`,
           'player_id': `${after[j].player_id}`,
-          'data': []
+          'data': {}
         };
         for(let i = 0; i < tracked.length; i++) {
-          output[j].data.push(after[j][tracked[i]]? 
+          output[j].data[tracked[i]] = 
+            after[j][tracked[i]]?
             after[j][tracked[i]] - before[k][tracked[i]]:
-            after[j].stats[tracked[i]] - before[k].stats[tracked[i]]
-            );
-          console.log(`${after[j][tracked[i]]} - ${before[k][tracked[i]]} = ${after[j][tracked[i]] - before[k][tracked[i]]}`);
+            after[j].stats[tracked[i]] - before[k].stats[tracked[i]];
         }
+      }
+    }
+  }
+  for(let i = 0; i < output.length; i++) {
+    if(!output[i]) { continue; }
+    for(let j = 0; j < output.length; j++) {
+      if(!output[j]) { continue; }
+      if(output[i].name === output[j].name && output[i].player_id !== output[j].player_id) {
+        for(let k = 0; k < tracked.length; k++) {
+          output[i].data[tracked[k]] = output[i].data[tracked[k]] + output[j].data[tracked[k]];
+        }
+        delete output[j];
       }
     }
   }
   return output;
 }
 
+const updateLeaders = (stats, tracked) => {
+  let leaderboard = require('./weeklyLeaders.json');
+  for(let i = 0; i < stats.length; i++) {
+    if(!stats[i]) { continue; }
+    for(let j = 0; j < tracked.length; j++) {
+      if(leaderboard[tracked[j]]) {
+        if(stats[i].data[tracked[j]] > leaderboard[tracked[j]].value) {
+          leaderboard[tracked[j]].name = stats[i].name;
+          leaderboard[tracked[j]].value = stats[i].data[tracked[j]];
+          if(stats[i].data[tracked[j]] > leaderboard[tracked[j]].record) {
+            leaderboard[tracked[j]].holder = stats[i].name;
+            leaderboard[tracked[j]].record = stats[i].data[tracked[j]];
+          }
+        }
+      } else {
+        leaderboard[tracked[j]] = {
+          "name": stats[i].name,
+          "value": stats[i].data[tracked[j]],
+          "record": stats[i].data[tracked[j]],
+          "holder": stats[i].name
+        }
+      }
+    }
+  }
+  fs.writeFile(
+    "./weeklyLeaders.json",
+    JSON.stringify(leaderboard),
+    'utf8',
+    function (err) {
+      if (err) {
+        console.log(
+          "An Error occured while writing leaders file\n      "
+        );
+        return console.log(err);
+      }
+    }    
+  );
+}
+
 const testFunction = () => {
   const before = require('./archive/1.json');
   const after = require('./gangMembers.json');
   const tracked = require('./trackedStats.json');
+  
+  
 
   results = calculateStatistics(tracked, before, after);
-  console.log(results);
+  updateLeaders(results, tracked);
 }
 
-//const compareLeaders = (statistic, player, )
+
+
 
 // ----------------- SUPPLIMENTAL FUNCTIONS --------- //
 

@@ -1,26 +1,26 @@
 {
     "kills": {
-        "name": "KudosTV",
-        "value": 38,
-        "record": 38,
-        "holder": "KudosTV"
+        "name": "xio",
+        "value": 164,
+        "record": 164,
+        "holder": "xio"
     },
     "deaths": {
-        "name": "Zombie Mall Cop",
-        "value": 27,
-        "record": 27,
-        "holder": "Zombie Mall Cop"
+        "name": "CYAN",
+        "value": 143,
+        "record": 143,
+        "holder": "CYAN"
     },
-    "prison": {
-        "name": "not jailbait",
-        "value": 25,
-        "record": 25,
-        "holder": "not jailbait"
+    "prison_time": {
+        "name": "BIGCOCKEST116",
+        "value": 89,
+        "record": 89,
+        "holder": "BIGCOCKEST116"
     },
-    "robbed": {
-        "name": "not jailbait",
-        "value": 0,
-        "record": 1,
-        "holder": "Darkness"
+    "players_robbed": {
+        "name": "Tommy Shelby",
+        "value": 9,
+        "record": 9,
+        "holder": "Tommy Shelby"
     }
 }
