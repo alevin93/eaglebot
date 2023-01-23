@@ -61,7 +61,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    console.log(message.author);
+    editTracked(message, command[1]);
   }
   if (command[0] === "caps") {
     getCaps(message);
@@ -167,22 +167,34 @@ const getWeeklyStats = (message) => {
   tracked = require('./trackedStats.json');
   //building fields
   fields = []
+  counter = 0;
   for(let i = 0; i < tracked.length; i++) {
     fields[i] = {
-      name: `${tracked[i].toUpperCase()}`,
-      value: `Week: ${json[tracked[i]].name} - ${json[tracked[i]].value} \n
-              Record: ${json[tracked[i]].holder} - ${json[tracked[i]].record}`
+      name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+      value: '```' + `${json[tracked[i]].name} - ${json[tracked[i]].value}` + '```',
+      inline: true
     }
   }
   console.log(fields);
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle("Daily Stats")
     .addFields(fields)
+    .setColor(0x591017)
     .setFooter({
       text: `Last Update: ${currentDate(2)}`,
     });
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
+
+const editTracked = (message, command, stat) => {
+  if(message.author.id === '288445122947973121') {
+    let tracked = require('./trackedStats.json');
+    if(tracked.length > 24) ( message.channel.send("Maximum amount of stats tracked! :("))
+    if(command === 'add') {
+      
+    }
+  }
+}
 
 
 // ---------- GET CAPS FUNCTION ---------- //
