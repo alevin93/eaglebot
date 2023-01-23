@@ -106,7 +106,7 @@ client.on("messageCreate", (message) => {
 
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
-  gangInfoFile = require('./gangInfo.json');
+  let gangInfoFile = require('./gangInfo.json');
   const statsEmbed = new EmbedBuilder()
     .setTitle("Comp Or Ban")
     .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
@@ -333,6 +333,7 @@ const archiveStats = () => {
 //----------- Cartel Split Function --------//
 
 const startCartel = async (message) => {
+  let gangInfoFile = require('./gangInfo.json');
   startingAmt = gangInfoFile.bank;
   message.channel.send(
     "Starting cartels at $" + startingAmt + " react if participating."
@@ -356,6 +357,7 @@ const startCartel = async (message) => {
 };
 
 const endCartel = async (message) => {
+  let gangInfoFile = require('./gangInfo.json');
   const endingAmt = gangInfoFile.bank;
   message.channel.send(
     "Split from cartels is $" +
