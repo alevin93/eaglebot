@@ -15,24 +15,12 @@ client.on("ready", () => {
   console.log("FloppaBot Activated");
 });
 
-var gangInfoFile = require("./gangInfo.json");
-var gangMemberFile = require('./gangMembers.json');
-var leadersFile = require('./weeklyLeaders.json');
-
 const formatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
   maximumFractionDigits: 0,
   minimumFractionDigits: 0,
 });
-
-var statList = []
-for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
-  statList[i] = Object.keys(gangMemberFile[0])[i]
-}
-for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
-  statList[i + Object.keys(gangMemberFile[0]).length] = Object.keys(gangMemberFile[0].stats)[i]
-}
 
 slayer_id = '209141852849307649';
 var weekCounter = 2;
@@ -46,21 +34,23 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 // -------------- CRON JOBS ------------- //
-// cron.schedule("30 */5 * * * * *", () => {
-//   archiveStats();
-// })
+cron.schedule("10 * */10 * * *", () => {
+  updateAllStats();
+})
 
-// cron.schedule("45 */10 * * * * *", () => {
-//   recordWeekStats();
-// })
+//end of week jobs
+cron.schedule("30 * 0 * * 1", () => {
+  archiveStats();
+  recordWeekStats();
+})
 
-// cron.schedule("1 */5 * * * *", () => {
-//   writeGangInfo();
-// });
+cron.schedule("5 */5 * * * *", () => {
+  writeGangInfo();
+});
 
-// cron.schedule("10 */5 * * * * ", () => {
-//   writeGangMemberInfo();
-// });
+cron.schedule("0 */10 * * * * ", () => {
+  writeGangMemberInfo();
+});
 
 // ---------- MAIN FUNCTION ----------- //
 client.on("messageCreate", (message) => {
@@ -69,9 +59,6 @@ client.on("messageCreate", (message) => {
   const temp = args.shift().toLowerCase();
   const command = temp.split(" ")
 
-  if (command[0] === "check") {
-    editTracked(message, command[1], command[2]);
-  }
   if (command[0] === "caps") {
     getCaps(message);
   }
@@ -85,7 +72,21 @@ client.on("messageCreate", (message) => {
     gangEmbed(message);
   }
   if (command[0] === "stats") {
-    getWeeklyStats(message);
+    if(command[2]) {
+      editTracked(message, command[1], command[2]);
+    }
+    else if(command[1]) {
+      getMemberStats(message, command[1]);
+    } 
+    else {
+      getWeeklyStats(message);
+    }
+  }
+  if (command[0] === "last") {
+    getLastWeekStats(message);
+  }
+  if (command[0] === "record" || command[0] === "records") {
+    getRecordStats(message);
   }
   if (command[0] === "startcap") {
     startCartel(message);
@@ -93,21 +94,21 @@ client.on("messageCreate", (message) => {
   if (command[0] === "endcap") {
     endCartel(message);
   }
-  if (command[0] === "iron") {
-    if(command[1]) {
-      checkMemberLedger(message, command[1]);
-    }
-    else {
-      checkIronLedger(message);
-    }
-  }
-  if (command[0] === "test") {
-    testFunction();
-  }
-  if (command[0] === "fetch"){
-    writeGangInfo();
-    writeGangMemberInfo();
-  }
+  // if (command[0] === "iron") {
+  //   if(command[1]) {
+  //     checkMemberLedger(message, command[1]);
+  //   }
+  //   else {
+  //     checkIronLedger(message);
+  //   }
+  // }
+  // if (command[0] === "test") {
+  //   testFunction();
+  // }
+  // if (command[0] === "fetch"){
+  //   writeGangInfo();
+  //   writeGangMemberInfo();
+  //  }
   // if (command[0] === "record"){
   //   archiveStats();
   // }
@@ -180,11 +181,10 @@ const getWeeklyStats = (message) => {
   for(let i = 0; i < tracked.length; i++) {
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: '```' + `${json[tracked[i]].name} - ${json[tracked[i]].value}` + '```',
+      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
       inline: true
     }
   }
-  console.log(fields);
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle("Daily Stats")
     .addFields(fields)
@@ -195,8 +195,96 @@ const getWeeklyStats = (message) => {
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
 
+const getLastWeekStats = (message) => {
+  json = require('./lastWeekLeaders.json');
+  tracked = require('./trackedStats.json');
+  //building fields
+  fields = []
+  for(let i = 0; i < tracked.length; i++) {
+    fields[i] = {
+      name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
+      inline: true
+    }
+  }
+  const weeklyStatsEmbed = new EmbedBuilder()
+    .setTitle("Daily Stats")
+    .addFields(fields)
+    .setColor(0x591017)
+    .setFooter({
+      text: `Last Update: ${lastUpdate}`,
+    });
+  message.channel.send({ embeds: [weeklyStatsEmbed] });
+};
+
+const getRecordStats = (message) => {
+  json = require('./weeklyLeaders.json');
+  tracked = require('./trackedStats.json');
+  records = require('./recordsArchive.json');
+  //building fields
+  fields = []
+  counter = 0;
+  for(let i = 0; i < tracked.length; i++) {
+    if(!json[tracked[i]].holder || !json[tracked[i].value]) { continue; }
+    fields[i] = {
+      name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+      value: `${json[tracked[i]].holder}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].record) : json[tracked[i]].record}` + '```',
+      inline: true
+    }
+  }
+  const weeklyStatsEmbed = new EmbedBuilder()
+    .setTitle("One Week Highs")
+    .addFields(fields)
+    .setColor(0x591017)
+    .setFooter({
+      text: `Last Update: ${lastUpdate}`,
+    });
+  message.channel.send({ embeds: [weeklyStatsEmbed] });
+};
+
+const getMemberStats = (message, command) => {
+  json = require('./memberStats.json');
+  tracked = require('./trackedStats.json');
+  var index = null;
+  for(let i = 0; i < json.length; i++) {
+    if(!json[i]) { continue; }
+    if(json[i].name.toLowerCase() === command) {
+      index = i;
+    }
+  }
+  //building fields
+  fields = []
+  counter = 0;
+  if(index === null) { message.channel.send("No player by that name found.  Make sure you have it exactly right!"); return; }
+  for(let i = 0; i < tracked.length; i++) {
+    if(!json[index].data) { continue; }
+    fields[i] = {
+      name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+      value: '```' + `${tracked[i] === 'bank'? formatter.format(json[index].data[tracked[i]]) : json[index].data[tracked[i]]}` + '```',
+      inline: true
+    }
+  }
+  console.log(fields);
+  const weeklyStatsEmbed = new EmbedBuilder()
+    .setTitle(`${json[index].name}'s Weekly Stats`)
+    .addFields(fields)
+    .setColor(0x591017)
+    .setFooter({
+      text: `Last Update: ${lastUpdate}`,
+    });
+  message.channel.send({ embeds: [weeklyStatsEmbed] });
+}
+
 const editTracked = (message, command, stat) => {
-  if(message.author.id === '288445122947973121') {
+  if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
+    const gangMemberFile = require('./gangMembers.json')
+    var statList = []
+    for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
+      statList[i] = Object.keys(gangMemberFile[0])[i]
+    }
+    for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
+      statList[i + Object.keys(gangMemberFile[0]).length] = Object.keys(gangMemberFile[0].stats)[i]
+    }
     let tracked = require('./trackedStats.json');
     let after = require('./gangMembers.json');
     let foundFlag = false;
@@ -215,15 +303,13 @@ const editTracked = (message, command, stat) => {
     if(command === 'remove') {
       for(let i = 0; i < tracked.length; i++) {
         if(tracked[i] === stat) {
-          tracked.pop(i);
+          tracked.splice(i, 1);
+          removeRecord(stat);
           message.channel.send(stat + " has been removed from tracking.");
           foundFlag = true;
         }
       }
       if(!foundFlag) {message.channel.send("It doesn't look like you're tracking a stat with that name");}
-    }
-    if(command === 'options') {
-      message.channel.send("Options: " + statList);
     }
     
     fs.writeFile(
@@ -238,9 +324,54 @@ const editTracked = (message, command, stat) => {
         console.log("Tracked file updated!")
       }
     );
+    console.log(tracked);
     let result = calculateStatistics(tracked, before, after);
     updateLeaders(result, tracked);
   }
+}
+
+const removeRecord = (stat) => {
+  const archive = require('./recordsArchive.json');
+  const leaders = require('./weeklyLeaders.json');
+  console.log(archive[stat].value < leaders[stat].record);
+  if(archive[stat]) {
+    if(archive[stat].value < leaders[stat].record) {
+      archive[stat].value = leaders[stat].record;
+      archive[stat].name = leaders[stat].holder;
+    }
+  } else {
+    rec = {
+      'name': leaders[stat].name,
+      'value': leaders[stat].record
+    }
+    archive[stat] = rec;
+  }
+  console.log(archive[stat]);
+  delete leaders[stat];
+  fs.writeFile(
+    "weeklyLeaders.json",
+    JSON.stringify(leaders),
+    "utf8",
+    function (err) {
+      if (err) {
+        console.log("An error occured while removing item from leaders file");
+        return console.log(err);
+      }
+      console.log("Leaders file updated!")
+    }
+  );
+  fs.writeFile(
+    "recordsArchive.json",
+    JSON.stringify(archive),
+    "utf8",
+    function (err) {
+      if (err) {
+        console.log("An error occured while saving records archive");
+        return console.log(err);
+      }
+      console.log("Archive File updated!")
+    }
+  );
 }
 
 
@@ -331,7 +462,6 @@ const writeGangInfo = async () => {
 };
 
 const writeGangMemberInfo = async () => {
-
     let members = gangInfoFile.members;
 
     gangMemberLink = gangMemberLink + members[0].player_id;
@@ -367,6 +497,21 @@ const writeGangMemberInfo = async () => {
       let gangMemberFile = require("./gangMembers.json");
     });
 };
+
+const updateMemberStats = (results) => {
+  fs.writeFile(
+    "memberStats.json",
+    JSON.stringify(results),
+    "utf8",
+    function (err) {
+      if (err) {
+        console.log("An error occured while writing member stats");
+        return console.log(err);
+      }
+      console.log("Member Stats File updated!")
+    }
+  );
+}
 
 const archiveStats = () => {
   fs.writeFile(
@@ -482,14 +627,24 @@ const checkMemberLedger = (message, name) => {
 
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
-const recordDailyStats = () => {
-  var oldData = require(`./archive/${weekCounter-1}.json`);
-  var newData = require('./gangMembers.json');
-
-
+const recordWeekStats = () => {
+  const leaders = require('./weeklyLeaders.json');
+  fs.writeFile(
+    "./lastWeekLeaders.json",
+    JSON.stringify(leaders),
+    'utf8',
+    function (err) {
+      if (err) {
+        console.log(
+          "An Error occured while writing last week's leaders file\n      "
+        );
+        return console.log(err);
+      }
+    }    
+  );
 }
 
-const recordWeekStats = () => {
+const recordWeekStatsOLD = () => {
   console.log(weekCounter);
   var data = require(`./archive/${weekCounter-1}.json`);
   var ironLedger = require('./ironLedger');
@@ -629,7 +784,6 @@ const recordWeekStats = () => {
 
 const calculateStatistics = (tracked, before, after) => {
   var output = [];
-  console.log(after);
   for(let j = 0; j < after.length; j++) {
     for(let k = 0; k < before.length; k++) {
       if(after[j].player_id === before[k].player_id) {
@@ -664,6 +818,7 @@ const calculateStatistics = (tracked, before, after) => {
 
 const updateLeaders = (stats, tracked) => {
   let leaderboard = require('./weeklyLeaders.json');
+  let archive = require('./recordsArchive.json');
   for(let i = 0; i < stats.length; i++) {
     if(!stats[i]) { continue; }
     for(let j = 0; j < tracked.length; j++) {
@@ -686,6 +841,15 @@ const updateLeaders = (stats, tracked) => {
       }
     }
   }
+  for(var key of Object.keys(leaderboard)) {
+    if(leaderboard[key]) {
+      if(leaderboard[key].record < archive[key].value) {
+        leaderboard[key].holder = archive[key].name;
+        leaderboard[key].record = archive[key].value;
+        console.log("Finished FOR LOOP");
+      }
+    }
+  }
   fs.writeFile(
     "./weeklyLeaders.json",
     JSON.stringify(leaderboard),
@@ -701,15 +865,15 @@ const updateLeaders = (stats, tracked) => {
   );
 }
 
-const testFunction = () => {
+const updateAllStats = () => {
   const before = require('./archive/1.json');
   const after = require('./gangMembers.json');
   const tracked = require('./trackedStats.json');
-  
-  
 
-    results = calculateStatistics(tracked, before, after);
-    updateLeaders(results, tracked);
+  result = calculateStatistics(tracked, before, after);
+  updateLeaders(result, tracked);
+  updateMemberStats(result);
+
 }
 
 
