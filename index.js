@@ -34,8 +34,9 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 // -------------- CRON JOBS ------------- //
-cron.schedule("10 * */10 * * *", () => {
+cron.schedule("10 */10 * * * *", () => {
   updateAllStats();
+  console.log("STATS HAVE BEEN UPDATED!");
 })
 
 //end of week jobs
