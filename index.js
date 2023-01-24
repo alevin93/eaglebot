@@ -23,7 +23,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 slayer_id = '209141852849307649';
-var weekCounter = 2;
+var weekCounter = 0;
 const prefix = "!";
 var gmUpdated = null;
 var lastUpdate = null;
@@ -457,11 +457,12 @@ const writeGangInfo = async () => {
         console.log("gangInfo.json updated");
       }
     );
-    let gangInfoFile = require('./gangInfo.json');
   });
 };
 
 const writeGangMemberInfo = async () => {
+    const gangInfoFile = require('./gangInfo.json');
+    const archive = require(`./archive/0.json`);
     let members = gangInfoFile.members;
 
     gangMemberLink = gangMemberLink + members[0].player_id;
@@ -494,7 +495,9 @@ const writeGangMemberInfo = async () => {
         }
       );
       gmUpdated = currentDate();
-      let gangMemberFile = require("./gangMembers.json");
+      if(!archive.exists()) {
+        archiveStats();
+      }
     });
 };
 
@@ -866,7 +869,7 @@ const updateLeaders = (stats, tracked) => {
 }
 
 const updateAllStats = () => {
-  const before = require('./archive/1.json');
+  const before = require(`./archive/${weekCounter - 1}.json`);
   const after = require('./gangMembers.json');
   const tracked = require('./trackedStats.json');
 
