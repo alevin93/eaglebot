@@ -499,9 +499,6 @@ const writeGangMemberInfo = async () => {
         }
       );
       gmUpdated = currentDate();
-      if(weekCounter === 0) {
-        archiveStats();
-      }
     });
 };
 
