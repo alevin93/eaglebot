@@ -13,6 +13,7 @@ const client = new Client({
 
 client.on("ready", () => {
   console.log("FloppaBot Activated");
+  startUp();
 });
 
 const formatter = new Intl.NumberFormat("en-US", {
@@ -34,10 +35,6 @@ var gangMemberLink =
   "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 // -------------- CRON JOBS ------------- //
-cron.schedule("10 */10 * * * *", () => {
-  updateAllStats();
-  console.log("STATS HAVE BEEN UPDATED!");
-})
 
 //end of week jobs
 cron.schedule("30 * 0 * * 1", () => {
@@ -110,17 +107,15 @@ client.on("messageCreate", (message) => {
   //   }
   // }
   if (command[0] === "test") {
-    writeGangMemberInfo().then(() => {
-      updateAllStats();
-      console.log('Stats have been updated!');
-    });
+    writeGangMemberInfo();
   }
   if (command[0] === "fetch"){
     writeGangInfo();
    }
-  // if (command[0] === "record"){
-  //   archiveStats();
-  // }
+  if (command[0] === "update"){
+    weekCounter++;
+    updateAllStats();
+  }
 });
 
 //----------- GANG FUNCTION ------------ //
@@ -201,6 +196,7 @@ const getWeeklyStats = (message) => {
     .setFooter({
       text: `Last Update: ${lastUpdate}`,
     });
+  console.log("Get Weekly Stats Run.");
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
 
@@ -487,6 +483,7 @@ const writeGangMemberInfo = async () => {
       },
     });
     const json = await response.json().then((gangMembers) => {
+      if(gangMembers['errors']) { writeGangInfo().then(() => { writeGangMemberInfo();})}
       fs.writeFile(
         "gangMembers.json",
         JSON.stringify(gangMembers),
@@ -500,9 +497,9 @@ const writeGangMemberInfo = async () => {
           }
           console.log("gangMembers.json updated");
           lastUpdate = currentDate(1);
+          gmUpdated = currentDate();
         }
       );
-      gmUpdated = currentDate();
     });
 };
 
@@ -826,7 +823,11 @@ const calculateStatistics = (tracked, before, after) => {
 }
 
 const updateLeaders = (stats, tracked) => {
+  leaderboard = null;
+  try {
   let leaderboard = require('./weeklyLeaders.json');
+  } catch (err) { console.log(err); }
+  if(!leaderboard) { leaderboard = {};}
   let archive = require('./recordsArchive.json');
   for(let i = 0; i < stats.length; i++) {
     if(!stats[i]) { continue; }
@@ -881,7 +882,6 @@ const updateAllStats = () => {
   const tracked = require('./trackedStats.json');
 
   result = calculateStatistics(tracked, before, after);
-  console.log(result);
   updateLeaders(result, tracked);
   updateMemberStats(result);
 
@@ -922,6 +922,22 @@ const currentDate = (num) => {
                   + currentdate.getYear();
         return date;
   }
+}
+
+const startUp = async () => {
+  writeGangInfo();
+  await sleep(5000);
+  writeGangMemberInfo();
+  await sleep(5000);
+  archiveStats();
+  await sleep(5000);
+  updateAllStats();
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 client.login(process.env.TOKEN);
