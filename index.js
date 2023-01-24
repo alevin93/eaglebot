@@ -463,7 +463,9 @@ const writeGangInfo = async () => {
 };
 
 const writeGangMemberInfo = async () => {
+  try {
     const gangInfoFile = require('./gangInfo.json');
+  } catch (err) {console.log(err)}
     const archive = require(`./archive/0.json`);
     let members = gangInfoFile.members;
 
