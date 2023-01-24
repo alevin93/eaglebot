@@ -23,7 +23,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 slayer_id = '209141852849307649';
-var weekCounter = 1;
+var weekCounter = 0;
 const prefix = "!";
 var gmUpdated = null;
 var lastUpdate = null;
@@ -499,8 +499,8 @@ const writeGangMemberInfo = async () => {
         }
       );
       gmUpdated = currentDate();
-      if(weekCounter === 1) {
-        //archiveStats();
+      if(weekCounter === 0) {
+        archiveStats();
       }
     });
 };
