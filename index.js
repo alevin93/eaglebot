@@ -183,6 +183,7 @@ const getWeeklyStats = (message) => {
   fields = []
   counter = 0;
   for(let i = 0; i < tracked.length; i++) {
+    if(!json[tracked[i]]) { continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
       value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
@@ -496,8 +497,8 @@ const writeGangMemberInfo = async () => {
             return console.log(err);
           }
           console.log("gangMembers.json updated");
-          lastUpdate = currentDate(1);
-          gmUpdated = currentDate();
+          lastUpdate = currentDate(2);
+          gmUpdated = currentDate(2);
         }
       );
     });
