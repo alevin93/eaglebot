@@ -83,10 +83,7 @@ client.on("messageCreate", (message) => {
       editTracked(message, command[1], command[2]);
     }
     else if(command[1]) {
-      getMemberStats(message, command[1]).then(() => {
-        updateAllStats();
-        console.log('Stats have been updated!');
-      });
+      getMemberStats(message, command[1])
     } 
     else {
       getWeeklyStats(message);
@@ -113,7 +110,10 @@ client.on("messageCreate", (message) => {
   //   }
   // }
   if (command[0] === "test") {
-    writeGangMemberInfo();
+    writeGangMemberInfo().then(() => {
+      updateAllStats();
+      console.log('Stats have been updated!');
+    });
   }
   if (command[0] === "fetch"){
     writeGangInfo();
