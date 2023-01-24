@@ -44,13 +44,16 @@ cron.schedule("30 * 0 * * 1", () => {
   recordWeekStats();
 })
 
-cron.schedule("5 */5 * * * *", () => {
+cron.schedule("* */5 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("0 */10 * * * * ", () => {
+cron.schedule("* */10 * * * * ", () => {
   writeGangMemberInfo();
 });
+
+
+
 
 // ---------- MAIN FUNCTION ----------- //
 client.on("messageCreate", (message) => {
@@ -102,13 +105,12 @@ client.on("messageCreate", (message) => {
   //     checkIronLedger(message);
   //   }
   // }
-  // if (command[0] === "test") {
-  //   testFunction();
-  // }
-  // if (command[0] === "fetch"){
-  //   writeGangInfo();
-  //   writeGangMemberInfo();
-  //  }
+  if (command[0] === "test") {
+    writeGangMemberInfo();
+  }
+  if (command[0] === "fetch"){
+    writeGangInfo();
+   }
   // if (command[0] === "record"){
   //   archiveStats();
   // }
