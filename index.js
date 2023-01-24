@@ -62,6 +62,9 @@ client.on("messageCreate", (message) => {
   const temp = args.shift().toLowerCase();
   const command = temp.split(" ")
 
+  if (command[0] === "check") {
+    archiveStats();
+  }
   if (command[0] === "caps") {
     getCaps(message);
   }
@@ -497,7 +500,7 @@ const writeGangMemberInfo = async () => {
       );
       gmUpdated = currentDate();
       if(weekCounter === 1) {
-        archiveStats();
+        //archiveStats();
       }
     });
 };
@@ -518,6 +521,7 @@ const updateMemberStats = (results) => {
 }
 
 const archiveStats = () => {
+  const gangMemberFile = require('./gangMembers.json');
   fs.writeFile(
     `./archive/${weekCounter}.json`,
     JSON.stringify(gangMemberFile),
