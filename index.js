@@ -56,9 +56,6 @@ cron.schedule("5 */10 * * * * ", () => {
   });
 });
 
-
-
-
 // ---------- MAIN FUNCTION ----------- //
 client.on("messageCreate", (message) => {
 
@@ -854,7 +851,7 @@ const updateLeaders = (stats, tracked) => {
     }
   }
   for(var key of Object.keys(leaderboard)) {
-    if(leaderboard[key]) {
+    if(archive[key]) {
       if(leaderboard[key].record < archive[key].value) {
         leaderboard[key].holder = archive[key].name;
         leaderboard[key].record = archive[key].value;
@@ -878,11 +875,13 @@ const updateLeaders = (stats, tracked) => {
 }
 
 const updateAllStats = () => {
+  console.log("Week Counter: " + weekCounter);
   const before = require(`./archive/${weekCounter - 1}.json`);
   const after = require('./gangMembers.json');
   const tracked = require('./trackedStats.json');
 
   result = calculateStatistics(tracked, before, after);
+  console.log(result);
   updateLeaders(result, tracked);
   updateMemberStats(result);
 
