@@ -26,10 +26,19 @@ const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
 });
 
+var statList = []
+for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
+  statList[i] = Object.keys(gangMemberFile[0])[i]
+}
+for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
+  statList[i + Object.keys(gangMemberFile[0]).length] = Object.keys(gangMemberFile[0].stats)[i]
+}
+
 slayer_id = '209141852849307649';
 var weekCounter = 2;
 const prefix = "!";
 var gmUpdated = null;
+var lastUpdate = null;
 var startingAmount = 1;
 var splitFlag = false;
 var participants = [];
@@ -61,7 +70,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    editTracked(message, command[1]);
+    editTracked(message, command[1], command[2]);
   }
   if (command[0] === "caps") {
     getCaps(message);
@@ -181,7 +190,7 @@ const getWeeklyStats = (message) => {
     .addFields(fields)
     .setColor(0x591017)
     .setFooter({
-      text: `Last Update: ${currentDate(2)}`,
+      text: `Last Update: ${lastUpdate}`,
     });
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
@@ -189,10 +198,48 @@ const getWeeklyStats = (message) => {
 const editTracked = (message, command, stat) => {
   if(message.author.id === '288445122947973121') {
     let tracked = require('./trackedStats.json');
-    if(tracked.length > 24) ( message.channel.send("Maximum amount of stats tracked! :("))
+    let after = require('./gangMembers.json');
+    let foundFlag = false;
+    let before = require(`./archive/${weekCounter-1}`);
+    if(tracked.length > 24) { ( message.channel.send("Maximum amount of stats tracked! :(")) }
     if(command === 'add') {
-      
+      for(let i = 0; i < statList.length; i++) {
+        if(stat.toLowerCase().replace(/[^\w\s]/gi, '') === statList[i].toLowerCase().replace(/[^\w\s]/gi, '')) {
+          tracked[tracked.length] = statList[i];
+          message.channel.send(stat + " is now being tracked");
+          foundFlag = true;
+        }
+      }
+      if(!foundFlag) { message.channel.send("I can't find a stat with that name, try rephrasing?"); }
     }
+    if(command === 'remove') {
+      for(let i = 0; i < tracked.length; i++) {
+        if(tracked[i] === stat) {
+          tracked.pop(i);
+          message.channel.send(stat + " has been removed from tracking.");
+          foundFlag = true;
+        }
+      }
+      if(!foundFlag) {message.channel.send("It doesn't look like you're tracking a stat with that name");}
+    }
+    if(command === 'options') {
+      message.channel.send("Options: " + statList);
+    }
+    
+    fs.writeFile(
+      "trackedStats.json",
+      JSON.stringify(tracked),
+      "utf8",
+      function (err) {
+        if (err) {
+          console.log("An error occured while updating tracked file");
+          return console.log(err);
+        }
+        console.log("Tracked file updated!")
+      }
+    );
+    let result = calculateStatistics(tracked, before, after);
+    updateLeaders(result, tracked);
   }
 }
 
@@ -313,6 +360,7 @@ const writeGangMemberInfo = async () => {
             return console.log(err);
           }
           console.log("gangMembers.json updated");
+          lastUpdate = currentDate(1);
         }
       );
       gmUpdated = currentDate();
@@ -581,6 +629,7 @@ const recordWeekStats = () => {
 
 const calculateStatistics = (tracked, before, after) => {
   var output = [];
+  console.log(after);
   for(let j = 0; j < after.length; j++) {
     for(let k = 0; k < before.length; k++) {
       if(after[j].player_id === before[k].player_id) {
@@ -659,8 +708,8 @@ const testFunction = () => {
   
   
 
-  results = calculateStatistics(tracked, before, after);
-  updateLeaders(results, tracked);
+    results = calculateStatistics(tracked, before, after);
+    updateLeaders(results, tracked);
 }
 
 
