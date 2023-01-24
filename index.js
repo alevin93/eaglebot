@@ -50,7 +50,10 @@ cron.schedule("0 */5 * * * *", () => {
 });
 
 cron.schedule("5 */10 * * * * ", () => {
-  writeGangMemberInfo();
+  writeGangMemberInfo().then(() => {
+    updateAllStats();
+    console.log('Stats have been updated!');
+  });
 });
 
 
@@ -83,7 +86,10 @@ client.on("messageCreate", (message) => {
       editTracked(message, command[1], command[2]);
     }
     else if(command[1]) {
-      getMemberStats(message, command[1]);
+      getMemberStats(message, command[1]).then(() => {
+        updateAllStats();
+        console.log('Stats have been updated!');
+      });
     } 
     else {
       getWeeklyStats(message);
