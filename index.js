@@ -44,11 +44,11 @@ cron.schedule("30 * 0 * * 1", () => {
   recordWeekStats();
 })
 
-cron.schedule("* */5 * * * *", () => {
+cron.schedule("0 */5 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("* */10 * * * * ", () => {
+cron.schedule("5 */10 * * * * ", () => {
   writeGangMemberInfo();
 });
 
