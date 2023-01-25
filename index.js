@@ -43,17 +43,18 @@ cron.schedule("30 * 0 * * 1", () => {
   recordWeekStats();
 })
 
+//constant jobs
 cron.schedule("0 */4 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("5 */8 * * * *", () => {
+cron.schedule("4 */8 * * * *", () => {
   writeGangMemberInfo();
 });
 
-cron.schedule("10 */8 * * * *", () => {
+cron.schedule("8 */8 * * * *", () => {
   updateAllStats();
-})
+});
 
 
 
@@ -64,9 +65,9 @@ client.on("messageCreate", (message) => {
   const temp = args.shift().toLowerCase();
   const command = temp.split(" ")
 
-  // if (command[0] === "check") {
-  //   archiveStats();
-  // }
+  if (command[0] === "check") {
+    archiveStats();
+  }
   if (command[0] === "caps") {
     getCaps(message);
   }
@@ -102,29 +103,29 @@ client.on("messageCreate", (message) => {
   if (command[0] === "endcap") {
     endCartel(message);
   }
-  // if (command[0] === "iron") {
-  //   if(command[1]) {
-  //     checkMemberLedger(message, command[1]);
-  //   }
-  //   else {
-  //     checkIronLedger(message);
-  //   }
-  // }
-  // if (command[0] === "test") {
-  //   writeGangMemberInfo();
-  // }
-  // if (command[0] === "fetch"){
-  //   writeGangInfo();
-  //  }
-  // if (command[0] === "update"){
-  //   updateAllStats();
-  // }
+  if (command[0] === "iron") {
+    if(command[1]) {
+      checkMemberLedger(message, command[1]);
+    }
+    else {
+      checkIronLedger(message);
+    }
+  }
+  if (command[0] === "test") {
+    writeGangMemberInfo();
+  }
+  if (command[0] === "fetch"){
+    writeGangInfo();
+   }
+  if (command[0] === "update"){
+    updateAllStats();
+  }
 });
 
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
-  let gangInfoFile = require('./gangInfo.json');
   delete require.cache[require.resolve('./gangInfo.json')];
+  let gangInfoFile = require('./gangInfo.json');
   // fs.readFile('./gangInfo.json', 'utf8', (err, gangInfo) => {
   //   if (err) {
   //      console.log(err);
@@ -197,8 +198,11 @@ const helpMessage = (message) => {
 // --------- POST STATS FUNCTIONS ---------//
 
 const getWeeklyStats = (message) => {
-  const json = require('./weeklyLeaders.json');
+  delete require.cache[require.resolve('./weeklyLeaders.json')];
+  delete require.cache[require.resolve('./trackedStats.json')];
+  json = require('./weeklyLeaders.json');
   const tracked = require('./trackedStats.json');
+  
   //building fields
   fields = []
   counter = 0;
@@ -222,6 +226,8 @@ const getWeeklyStats = (message) => {
 };
 
 const getLastWeekStats = (message) => {
+  delete require.cache[require.resolve('./lastWeekLeaders.json')];
+  delete require.cache[require.resolve('./trackedStats.json')];
   const json = require('./lastWeekLeaders.json');
   const tracked = require('./trackedStats.json');
   //building fields
@@ -244,9 +250,11 @@ const getLastWeekStats = (message) => {
 };
 
 const getRecordStats = (message) => {
+  delete require.cache[require.resolve('./weeklyLeaders.json')];
+  delete require.cache[require.resolve('./trackedStats.json')];
   const json = require('./weeklyLeaders.json');
   const tracked = require('./trackedStats.json');
-  records = require('./recordsArchive.json');
+  //const records = require('./recordsArchive.json');
   //building fields
   fields = []
   counter = 0;
@@ -269,6 +277,8 @@ const getRecordStats = (message) => {
 };
 
 const getMemberStats = (message, command) => {
+  delete require.cache[require.resolve('./memberStats.json')];
+  delete require.cache[require.resolve('./trackedStats.json')];
   const json = require('./memberStats.json');
   const tracked = require('./trackedStats.json');
   var index = null;
@@ -303,6 +313,8 @@ const getMemberStats = (message, command) => {
 
 const editTracked = (message, command, stat) => {
   if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
+    delete require.cache[require.resolve('./weekCounter.json')];
+    delete require.cache[require.resolve('./gangMembers.json')];
     const weekCounter = require('./weekCounter.json');
     const gangMemberFile = require('./gangMembers.json');
     var statList = []
@@ -312,11 +324,13 @@ const editTracked = (message, command, stat) => {
     for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
       statList[i + Object.keys(gangMemberFile[0]).length] = Object.keys(gangMemberFile[0].stats)[i]
     }
+    delete require.cache[require.resolve('./trackedStats.json')];
+    delete require.cache[require.resolve('./gangMembers.json')];
     let tracked = require('./trackedStats.json');
     let after = require('./gangMembers.json');
     let foundFlag = false;
-    before = null;
     console.log(weekCounter);
+    delete require.cache[require.resolve(`./archive/${weekCounter[0]}`)];
     before = require(`./archive/${weekCounter[0]}`);
     if(tracked.length > 24) { ( message.channel.send("Maximum amount of stats tracked! :(")) }
     if(command === 'add') {
@@ -360,6 +374,8 @@ const editTracked = (message, command, stat) => {
 }
 
 const removeRecord = (stat) => {
+  delete require.cache[require.resolve('./recordsArchive.json')];
+  delete require.cache[require.resolve('./weeklyLeaders.json')];
   const archive = require('./recordsArchive.json');
   const leaders = require('./weeklyLeaders.json');
   if(archive[stat]) {
@@ -490,6 +506,7 @@ const writeGangInfo = async () => {
 };
 
 const writeGangMemberInfo = async () => {
+    delete require.cache[require.resolve('./gangInfo.json')];
     let gangInfoFile = require('./gangInfo.json');
     
       const members = gangInfoFile.members;
@@ -544,6 +561,8 @@ const updateMemberStats = (results) => {
 }
 
 const archiveStats = () => {
+  delete require.cache[require.resolve('./gangMembers.json')];
+  delete require.cache[require.resolve('./weekCounter.json')];
   const gangMemberFile = require('./gangMembers.json');
   const weekNumber = require('./weekCounter.json');
   fs.writeFile(
@@ -566,7 +585,7 @@ const archiveStats = () => {
   fs.writeFile(
     `weekCounter.json`,
     JSON.stringify([
-      `[${week}]`
+      week
     ]),
     'utf8',
     function (err) {
@@ -584,6 +603,7 @@ const archiveStats = () => {
 //----------- Cartel Split Function --------//
 
 const startCartel = async (message) => {
+  delete require.cache[require.resolve('./gangInfo.json')];
   let gangInfoFile = require('./gangInfo.json');
   startingAmt = gangInfoFile.bank;
   message.channel.send(
@@ -608,6 +628,7 @@ const startCartel = async (message) => {
 };
 
 const endCartel = async (message) => {
+  delete require.cache[require.resolve('./gangInfo.json')];
   let gangInfoFile = require('./gangInfo.json');
   const endingAmt = gangInfoFile.bank;
   message.channel.send(
@@ -674,6 +695,7 @@ const checkMemberLedger = (message, name) => {
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
 const recordWeekStats = () => {
+  delete require.cache[require.resolve('./weeklyLeaders.json')];
   const leaders = require('./weeklyLeaders.json');
   fs.writeFile(
     "./lastWeekLeaders.json",
@@ -688,144 +710,6 @@ const recordWeekStats = () => {
       }
     }    
   );
-}
-
-const recordWeekStatsOLD = () => {
-  console.log(weekCounter);
-  var data = require(`./archive/${weekCounter}.json`);
-  var ironLedger = require('./ironLedger');
-  let skip = [2000];
-  let offset = 0;
-  leaders = leadersFile;
-  if(weekCounter === 1) {
-    let data = require(`./archive/52.json`);
-  }
-
-  json = data;
-
-  for(let i = 0; i < gangMemberFile.length; i++) {
-    
-    if(skip.includes(i)) { continue; }  // If i has been added to skip array (already counted that player), skip iteration
-
-    if(json[(i+offset)]?.player_id === gangMemberFile[i].player_id) {
-
-      let wkills = gangMemberFile[i].kills - json[i+offset].kills;
-      let wdeaths = gangMemberFile[i].deaths - json[i+offset].deaths;
-      let wprison = gangMemberFile[i].stats.prison_time - json[i+offset].stats.prison_time;
-      let wrobbed = gangMemberFile[i].stats.players_robbed - json[i+offset].stats.players_robbed;
-
-      let ironSold = gangMemberFile[i].stats.iron_sold - json[i+offset].stats.iron_sold;
-
-      for (let j = 0; j < gangMemberFile.length; j++) {
-        if(gangMemberFile[j].name === gangMemberFile[i].name && gangMemberFile[j].player_id !== gangMemberFile[i].player_id) {
-          wkills =  wkills + (gangMemberFile[j].kills - json[j+offset].kills);
-          wdeaths = wdeaths + (gangMemberFile[j].deaths - json[j+offset].deaths);
-          wprison = wprison + (gangMemberFile[j].stats.prison_time - json[j+offset].stats.prison_time);
-          wrobbed = wrobbed + (gangMemberFile[j].stats.players_robbed - json[j+offset].stats.players_robbed);
-
-          ironSold = ironSold + (gangMemberFile[j].stats.iron_sold - json[j+offset].stats.iron_sold);
-
-          skip.push(j);
-          console.log("SKIP ADDED: " + gangMemberFile[j].name);
-        }
-      }
-
-      if(ironSold > 0) {
-        const taxAmount = 175;
-        let ironFlag = false;
-        for(let j = 0; j < ironLedger.length; j++) {
-          if(ironLedger[j]?.player_id === gangMemberFile[i].player_id) {
-            ironFlag = true;
-
-            ironLedger[j].value = ironSold * taxAmount; 
-            ironLedger[j].iron_sold = ironSold; 
-            ironLedger[j].total_owed = ironLedger[j].total_owed + (ironSold * taxAmount);
-            ironLedger[j].transactions.push(`[${currentDate(1)}] Sold ${ironSold}. Tax added: ${formatter.format(ironSold * taxAmount)}.  Total: ${formatter.format(ironLedger[j].total_owed)}`)
-          }
-        }
-        if(!ironFlag) {
-          let ironFile = {
-            player_id: gangMemberFile[i].player_id,
-            name: gangMemberFile[i].name,
-            iron_sold: ironSold,
-            value: ironSold * taxAmount,
-            total_owed: ironSold * taxAmount,
-            transactions: [
-              `[${currentDate(1)}] Sold ${ironSold}. Tax added: ${formatter.format(ironSold * taxAmount)}.  Total: ${formatter.format(ironSold * taxAmount)}`,
-              ]
-          }
-          ironLedger[ironLedger.length] = ironFile;
-        }
-
-        console.log(ironLedger);
-
-      }
-
-      if(leaders.kills.value < wkills) {
-        leaders.kills.name = gangMemberFile[i].name;
-        leaders.kills.value = wkills
-        if(leaders.kills.record < wkills) {
-          leaders.kills.record = wkills;
-          leaders.kills.holder = gangMemberFile[i].name;
-        }
-      }
-      if(leaders.deaths.value < wdeaths) {
-        leaders.deaths.name = gangMemberFile[i].name;
-        leaders.deaths.value = wdeaths
-        if(leaders.deaths.record < wdeaths) {
-          leaders.deaths.record = wdeaths;
-          leaders.deaths.holder = gangMemberFile[i].name;
-        }
-      }
-      if(leaders.prison.value < wprison) {
-        leaders.prison.name = gangMemberFile[i].name;
-        leaders.prison.value = wprison;
-        if(leaders.prison.record < wprison) {
-          leaders.prison.record = wprison;
-          leaders.prison.holder = gangMemberFile[i].name;
-        }
-      }
-      if(leaders.robbed.value < (gangMemberFile[i].kills - json[i+offset].kills)) {
-        leaders.robbed.name = gangMemberFile[i].name;
-        leaders.robbed.value = wrobbed;
-        if(leaders.robbed.record < wrobbed) {
-          leaders.robbed.record = wrobbed;
-          leaders.robbed.holder = gangMemberFile[i].name;
-        }
-      }
-    } else {
-      offset++;
-      i--;
-    }
-  }
-  fs.writeFile(
-    `./weeklyLeaders.json`,
-    JSON.stringify(leaders),
-    'utf8',
-    function (err) {
-      if (err) {
-        console.log(
-          "An Error occured while writing leaders file\n      "
-        );
-        return console.log(err);
-      }
-    }
-  )
-  fs.writeFile(
-    `./ironLedger.json`,
-    JSON.stringify(ironLedger),
-    'utf8',
-    function (err) {
-      if (err) {
-        console.log(
-          "An Error occured while writing iron ledger file\n      "
-        );
-        return console.log(err);
-      }
-    }
-  )
-
-  console.log("Leaders Updated!");
 }
 
 const calculateStatistics = (tracked, before, after) => {
@@ -865,9 +749,11 @@ const calculateStatistics = (tracked, before, after) => {
 const updateLeaders = (stats, tracked) => {
   leaderboard = null;
   try {
-  let leaderboard = require('./weeklyLeaders.json');
+    delete require.cache[require.resolve('./weeklyLeaders.json')];
+    let leaderboard = require('./weeklyLeaders.json');
   } catch (err) { console.log(err); }
   if(!leaderboard) { leaderboard = {};}
+  delete require.cache[require.resolve('./recordsArchive.json')];
   let archive = require('./recordsArchive.json');
   for(let i = 0; i < stats.length; i++) {
     if(!stats[i]) { continue; }
@@ -896,11 +782,9 @@ const updateLeaders = (stats, tracked) => {
       if(leaderboard[key].record < archive[key].value) {
         leaderboard[key].holder = archive[key].name;
         leaderboard[key].record = archive[key].value;
-        console.log("Finished FOR LOOP");
       }
     }
   }
-  console.log(leaderboard);
   fs.writeFile(
     "./weeklyLeaders.json",
     JSON.stringify(leaderboard),
@@ -930,6 +814,8 @@ const updateAllStats = () => {
   result = calculateStatistics(tracked, before, after);
   updateLeaders(result, tracked);
   updateMemberStats(result);
+
+  console.log("Stats Updated!");
 
 }
 
@@ -974,11 +860,11 @@ const startUp = async () => {
   week = require('./weekCounter.json');
   delete require.cache[require.resolve('./weekCounter.json')]
   weekCounter = week[0];
-  writeGangInfo();
-  await sleep(5000);
-  writeGangMemberInfo();
-  await sleep(5000);
-  updateAllStats();
+  //writeGangInfo();
+  //await sleep(5000);
+  //writeGangMemberInfo();
+  //await sleep(5000);
+  //updateAllStats();
 }
 
 function sleep(ms) {
