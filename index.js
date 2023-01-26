@@ -77,6 +77,7 @@ client.on("messageCreate", (message) => {
 
   if (command[0] === "check") {
     checkCaps();
+    console.log(message);
   }
   if (command[0] === "caps") {
     getCaps(message);
@@ -88,7 +89,11 @@ client.on("messageCreate", (message) => {
     helpMessage(message);
   }
   if (command[0] === "gang") {
-    gangEmbed(message);
+    if(command[1] === "roster") {
+      getRoster(message);
+    } else {
+      gangEmbed(message);
+    }
   }
   if (command[0] === "stats") {
     if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
@@ -169,6 +174,23 @@ const gangEmbed = (message) => {
     message.channel.send({ embeds: [statsEmbed] });
   }})
 };
+
+const getRoster = (message, command) => {
+  fs.readFile('./memberStats.json', 'utf8', (err, data) => {
+    const members = JSON.parse(data);
+    console.log(members.length);
+    var roster = [];
+    for(let i = 0; i < members.length; i++) {
+      if(!members[i] || members[i] === "") { continue; }
+      roster =  roster + `${members[i].name} - `;
+      if(!roster[i] || roster[i] === "") {
+        roster.pop(i);
+      }
+    }
+    console.log(roster);
+    message.channel.send(roster);
+  });
+}
 
 //----------- HELP FUNCTION ------------ //
 const helpMessage = (message) => {
@@ -995,10 +1017,10 @@ const startUp = async () => {
   week = require('./weekCounter.json');
   weekCounter = week[0];
   validateFiles();
-  writeGangInfo();
-  await sleep(5000);
-  writeGangMemberInfo();
-  await sleep(10000);
+  //writeGangInfo();
+  //await sleep(5000);
+  //writeGangMemberInfo();
+  //await sleep(10000);
   updateAllStats();
 }
 
