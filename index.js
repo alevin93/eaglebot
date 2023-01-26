@@ -23,8 +23,15 @@ const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
 });
 
-slayer_id = '209141852849307649';
+
+const slayer_id = '209141852849307649';
+const gang_id = '25546'
+const channel_id = '1061443428925317213'
+const guild_id = '1061443428392636477'
 const prefix = "!";
+
+var capsData = null;
+
 var giUpdated = null;
 var gmUpdated = null;
 var startingAmount = 1;
@@ -56,6 +63,9 @@ cron.schedule("8 */8 * * * *", () => {
   updateAllStats();
 });
 
+// cron.schedule("*/1 * * * *", () => {
+//   writeCaps();
+// });
 
 
 // ---------- MAIN FUNCTION ----------- //
@@ -66,7 +76,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    archiveStats();
+    checkCaps();
   }
   if (command[0] === "caps") {
     getCaps(message);
@@ -81,11 +91,16 @@ client.on("messageCreate", (message) => {
     gangEmbed(message);
   }
   if (command[0] === "stats") {
-    if(command[2]) {
+    if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
       editTracked(message, command[1], command[2]);
     }
     else if(command[1]) {
-      getMemberStats(message, command[1])
+      var playerName = "";
+      for(let i = 1; i < command.length; i++) {
+        playerName = `${playerName}` + `${command[i]}`;
+        console.log(playerName)
+      }
+      getMemberStats(message, playerName)
     } 
     else {
       getWeeklyStats(message);
@@ -112,9 +127,11 @@ client.on("messageCreate", (message) => {
     }
   }
   if (command[0] === "test") {
-    writeGangMemberInfo();
+    //writeGangMemberInfo();
+    checkCapsdata();
   }
   if (command[0] === "fetch"){
+    
     writeGangInfo();
    }
   if (command[0] === "update"){
@@ -124,33 +141,33 @@ client.on("messageCreate", (message) => {
 
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
-  delete require.cache[require.resolve('./gangInfo.json')];
-  let gangInfoFile = require('./gangInfo.json');
-  // fs.readFile('./gangInfo.json', 'utf8', (err, gangInfo) => {
-  //   if (err) {
-  //      console.log(err);
-  //   }
-  //   else {
+  //delete require.cache[require.resolve('./gangInfo.json')];
+  //let gangInfoFile = require('./gangInfo.json');
+  fs.readFile('./gangInfo.json', 'utf8', (err, gangInfoFile) => {
+    if (err) {
+       console.log(err);
+    }
+    else {
     const statsEmbed = new EmbedBuilder()
       .setTitle("Comp Or Ban")
       .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
       .setURL("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
       .addFields(
-        { name: "Gang Funds", value: `${formatter.format(gangInfoFile.bank)}`, inline: true },
+        { name: "Gang Funds", value: `${formatter.format(JSON.parse(gangInfoFile).bank)}`, inline: true },
         {
           name: "War Kills",
-          value: `${gangInfoFile.kills}`,
+          value: `${JSON.parse(gangInfoFile).kills}`,
           inline: true,
         },
         {
           name: "War Deaths",
-          value: `${gangInfoFile.deaths}`,
+          value: `${JSON.parse(gangInfoFile).deaths}`,
           inline: true,
         }
       )
       .setFooter({ text: "Last Update: " + giUpdated });
     message.channel.send({ embeds: [statsEmbed] });
-  //}})
+  }})
 };
 
 //----------- HELP FUNCTION ------------ //
@@ -202,7 +219,21 @@ const getWeeklyStats = (message) => {
   delete require.cache[require.resolve('./trackedStats.json')];
   json = require('./weeklyLeaders.json');
   const tracked = require('./trackedStats.json');
-  
+  fs.readFile('./weeklyLeaders.json', 'utf8', (err, tempJson) => {
+    if (err) {
+       console.log(err);
+    }
+    else {
+      fs.readFile('./trackedStats.json', 'utf8', (err, tempTracked) => {
+        if (err) {
+           console.log(err);
+        }
+        else {
+
+          const json = JSON.parse(tempJson);
+          const tracked = JSON.parse(tempTracked);
+  console.log(json);
+  console.log(tracked);
   //building fields
   fields = []
   counter = 0;
@@ -223,6 +254,10 @@ const getWeeklyStats = (message) => {
     });
   console.log("Get Weekly Stats Run.");
   message.channel.send({ embeds: [weeklyStatsEmbed] });
+        }
+      })
+    }
+  })
 };
 
 const getLastWeekStats = (message) => {
@@ -252,9 +287,10 @@ const getLastWeekStats = (message) => {
 const getRecordStats = (message) => {
   delete require.cache[require.resolve('./weeklyLeaders.json')];
   delete require.cache[require.resolve('./trackedStats.json')];
+  delete require.cache[require.resolve('./recordsArchive.json')];
   const json = require('./weeklyLeaders.json');
   const tracked = require('./trackedStats.json');
-  //const records = require('./recordsArchive.json');
+  const records = require('./recordsArchive.json');
   //building fields
   fields = []
   counter = 0;
@@ -284,7 +320,7 @@ const getMemberStats = (message, command) => {
   var index = null;
   for(let i = 0; i < json.length; i++) {
     if(!json[i]) { continue; }
-    if(json[i].name.toLowerCase() === command) {
+    if(json[i].name.toLowerCase().replace(/\s/g, '') === command.toLowerCase().replace(/\s/g, '')) {
       index = i;
     }
   }
@@ -311,12 +347,24 @@ const getMemberStats = (message, command) => {
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 }
 
-const editTracked = (message, command, stat) => {
+const editTracked = async (message, command, stat) => {
   if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
-    delete require.cache[require.resolve('./weekCounter.json')];
-    delete require.cache[require.resolve('./gangMembers.json')];
-    const weekCounter = require('./weekCounter.json');
-    const gangMemberFile = require('./gangMembers.json');
+    // delete require.cache[require.resolve('./weekCounter.json')];
+    // delete require.cache[require.resolve('./gangMembers.json')];
+    // const weekCounter = require('./weekCounter.json');
+    // const gangMemberFile = require('./gangMembers.json');
+    fs.readFile('./weekCounter.json', 'utf8', (err, tempWeekCounter) => {
+      if (err) {
+         console.log(err);
+      }
+      else {
+        fs.readFile('./gangMembers.json', 'utf8', (err, tempGangMembers) => {
+          if (err) {
+             console.log(err);
+          }
+          else {
+            gangMemberFile = JSON.parse(tempGangMembers);
+            weekCounter = JSON.parse(tempWeekCounter);
     var statList = []
     for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
       statList[i] = Object.keys(gangMemberFile[0])[i]
@@ -326,8 +374,20 @@ const editTracked = (message, command, stat) => {
     }
     delete require.cache[require.resolve('./trackedStats.json')];
     delete require.cache[require.resolve('./gangMembers.json')];
-    let tracked = require('./trackedStats.json');
-    let after = require('./gangMembers.json');
+    //let tracked = require('./trackedStats.json');
+    //let after = require('./gangMembers.json');
+    fs.readFile('./trackedStats.json', 'utf8', (err, tempTracked) => {
+      if (err) {
+         console.log(err);
+      }
+      else {
+        fs.readFile('./gangMembers.json', 'utf8', (err, tempGangMembers) => {
+          if (err) {
+             console.log(err);
+          }
+          else {
+            var tracked = JSON.parse(tempTracked);
+            var after = JSON.parse(tempGangMembers);
     let foundFlag = false;
     console.log(weekCounter);
     delete require.cache[require.resolve(`./archive/${weekCounter[0]}`)];
@@ -347,10 +407,10 @@ const editTracked = (message, command, stat) => {
       for(let i = 0; i < tracked.length; i++) {
         if(tracked[i] === stat) {
           tracked.splice(i, 1);
-          removeRecord(stat);
           message.channel.send(stat + " has been removed from tracking.");
           foundFlag = true;
         }
+        removeRecord(stat);
       }
       if(!foundFlag) {message.channel.send("It doesn't look like you're tracking a stat with that name");}
     }
@@ -367,17 +427,42 @@ const editTracked = (message, command, stat) => {
         console.log("Tracked file updated!")
       }
     );
-    console.log(tracked);
     let result = calculateStatistics(tracked, before, after);
     updateLeaders(result, tracked);
+          }
+        })
+      }
+    })
+  }
+})
+      }
+    })
+  }
+  else {
+    message.channel.send("Access denied!  Ask Slayr.");
   }
 }
 
-const removeRecord = (stat) => {
-  delete require.cache[require.resolve('./recordsArchive.json')];
-  delete require.cache[require.resolve('./weeklyLeaders.json')];
-  const archive = require('./recordsArchive.json');
-  const leaders = require('./weeklyLeaders.json');
+const removeRecord = async (stat) => {
+  // delete require.cache[require.resolve('./recordsArchive.json')];
+  // delete require.cache[require.resolve('./weeklyLeaders.json')];
+  // const archive = require('./recordsArchive.json');
+  // const leaders = require('./weeklyLeaders.json');
+
+  fs.readFile('./weeklyLeaders.json', 'utf8', (err, tempLeaders) => {
+    if (err) {
+       console.log(err);
+    }
+    else {
+      fs.readFile('./recordsArchive.json', 'utf8', (err, tempArchive) => {
+        if (err) {
+           console.log(err);
+        }
+        else {
+
+          var leaders = JSON.parse(tempLeaders);
+          var archive = JSON.parse(tempArchive);
+
   if(archive[stat]) {
     if(archive[stat].value < leaders[stat].record) {
       archive[stat].value = leaders[stat].record;
@@ -385,12 +470,11 @@ const removeRecord = (stat) => {
     }
   } else {
     rec = {
-      'name': leaders[stat].name,
-      'value': leaders[stat].record
+      'name': `${leaders[stat].name}`,
+      'value': `${leaders[stat].record}`
     }
     archive[stat] = rec;
   }
-  console.log(archive[stat]);
   delete leaders[stat];
   fs.writeFile(
     "weeklyLeaders.json",
@@ -416,6 +500,10 @@ const removeRecord = (stat) => {
       console.log("Archive File updated!")
     }
   );
+        }
+      })
+    }
+  })
 }
 
 
@@ -451,6 +539,50 @@ const getCaps = async (message) => {
     message.channel.send({ embeds: [cartelEmbed] });
   });
 };
+
+// const writeCaps = async () => {
+//   const response = await fetch(
+//     "https://stats.olympus-entertainment.com/api/v3.0/cartels/",
+//     {
+//       headers: {
+//         accept: "application/json",
+//         Authorization:
+//           "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
+//       },
+//     }
+//   );
+//   const json = await response.json().then((cartelInfo) => {
+//     fs.writeFile(
+//       "cartelInfo.json",
+//       JSON.stringify(cartelInfo),
+//       "utf8",
+//       function (err) {
+//         if (err) {
+//           console.log("An error occured while saving cartel info");
+//           return console.log(err);
+//         }
+//         console.log("cartel info updated!")
+//         //checkCaps(cartelInfo);
+//       }
+//     );
+//   });
+// };
+
+// const checkCaps = async (data) => {
+//   // for(let i = 0; i < data.length; i++) {
+//   //   if(data[i].gang_id === parseInt(gang_id)) {
+//     const channel = client.channels.cache.get(channel_id);
+//     capsData = channel.send("Hello!");
+//     await sleep(300000);
+
+//     //capsMessage = channel.send('```' + `${data[i].name}` + '```' + ' on ```' + `${data[i].server}` + '``` was taken!  React to this message if you are taking part!');
+//   //   }
+//   // }
+// }
+
+const checkCapsdata = () => {
+  
+}
 
 // -------------- FLOPPA IMG FUNCTION ------------------------------------------------------------------------------------------------------------------------- //
 const floppaImg = async (message) => {
@@ -692,6 +824,8 @@ const checkMemberLedger = (message, name) => {
   
 }
 
+//
+
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
 const recordWeekStats = () => {
@@ -750,7 +884,7 @@ const updateLeaders = (stats, tracked) => {
   leaderboard = null;
   try {
     delete require.cache[require.resolve('./weeklyLeaders.json')];
-    let leaderboard = require('./weeklyLeaders.json');
+    var leaderboard = require('./weeklyLeaders.json');
   } catch (err) { console.log(err); }
   if(!leaderboard) { leaderboard = {};}
   delete require.cache[require.resolve('./recordsArchive.json')];
@@ -857,20 +991,170 @@ const currentDate = (num) => {
 }
 
 const startUp = async () => {
-  week = require('./weekCounter.json');
   delete require.cache[require.resolve('./weekCounter.json')]
+  week = require('./weekCounter.json');
   weekCounter = week[0];
-  //writeGangInfo();
-  //await sleep(5000);
-  //writeGangMemberInfo();
-  //await sleep(5000);
-  //updateAllStats();
+  validateFiles();
+  writeGangInfo();
+  await sleep(5000);
+  writeGangMemberInfo();
+  await sleep(10000);
+  updateAllStats();
 }
 
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+const validateFiles = () => {
+  var gangInfo = null;
+  try {
+    gangInfo = require('./gangInfo.json')
+  } catch (err) {
+    console.log("No Gang Info File detected");
+  }
+  if(!gangInfo) {
+    fs.writeFile(
+      "./gangInfo.json",
+      JSON.stringify({}),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./gangInfo.json')]) {
+    delete require.cache[require.resolve('./gangInfo.json')]
+  }
+  var gangMembers = null;
+  try {
+    gangMembers = require('./gangMembers.json')
+  } catch (err) {
+    console.log("No Gang Members File detected");
+  }
+  if(!gangMembers) {
+    fs.writeFile(
+      "./gangMembers.json",
+      JSON.stringify([]),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./gangMembers.json')]) {
+    delete require.cache[require.resolve('./gangMembers.json')]
+  }
+  var memberStats = null;
+  try {
+    memberStats = require('./memberStats.json')
+  } catch (err) {
+    console.log("No member stats file detected");  
+  }
+  if(!memberStats) {
+    fs.writeFile(
+      "./memberStats.json",
+      JSON.stringify([]),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./memberStats.json')]) {
+    delete require.cache[require.resolve('./memberStats.json')]
+  }
+  var tracked = null;
+  try {
+    tracked = require('./trackedStats.json')
+  } catch (err) {
+    console.log("No tracked stats file detected");  
+  }
+  if(!tracked) {
+    fs.writeFile(
+      "./trackedStats.json",
+      JSON.stringify(["kills","deaths","players_robbed","prison_time"]),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./trackedStats.json')]) {
+    delete require.cache[require.resolve('./trackedStats.json')]
+  }
+
+  var weekly = null;
+  try {
+    weekly = require('./weeklyLeaders.json')
+  } catch (err) {
+    console.log("No weekly leader file detected");  
+  }
+  if(!weekly) {
+    fs.writeFile(
+      "./weeklyLeaders.json",
+      JSON.stringify({}),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./weeklyLeaders.json')]) {
+    delete require.cache[require.resolve('./weeklyLeaders.json')]
+  }
+
+  var archive = null;
+  try {
+    archive = require('./recordsArchive.json')
+  } catch (err) {
+    console.log("No records archive file detected");  
+  }
+  if(!archive) {
+    fs.writeFile(
+      "./recordsArchive.json",
+      JSON.stringify({}),
+      'utf8',
+      function (err) {
+        if (err) {
+          console.log(
+            "An Error occured while validating files\n      "
+          );
+          return console.log(err);
+        }
+      }    
+    );
+  }
+  if(require.cache[require.resolve('./recordsArchive.json')]) {
+    delete require.cache[require.resolve('./recordsArchive.json')]
+  }
 }
 
 client.login(process.env.TOKEN);
