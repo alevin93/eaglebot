@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder, InteractionCollector, Intents, interaction, ComponentType } = require("discord.js");
 const fs = require("fs");
 const cron = require("node-cron");
 require("dotenv/config");
@@ -8,6 +8,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
   ],
 });
 
@@ -30,7 +31,7 @@ const channel_id = '1061443428925317213'
 const guild_id = '1061443428392636477'
 const prefix = "!";
 
-var capsData = null;
+var capsData = [];
 
 var giUpdated = null;
 var gmUpdated = null;
@@ -77,71 +78,71 @@ client.on("messageCreate", (message) => {
 
   if (command[0] === "check") {
     checkCaps();
-    console.log(message);
+    //console.log(message);
   }
-  if (command[0] === "caps") {
-    getCaps(message);
-  }
-  if (command[0] === "floppa") {
-    floppaImg(message);
-  }
-  if (command[0] === "help") {
-    helpMessage(message);
-  }
-  if (command[0] === "gang") {
-    if(command[1] === "roster") {
-      getRoster(message);
-    } else {
-      gangEmbed(message);
-    }
-  }
-  if (command[0] === "stats") {
-    if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
-      editTracked(message, command[1], command[2]);
-    }
-    else if(command[1]) {
-      var playerName = "";
-      for(let i = 1; i < command.length; i++) {
-        playerName = `${playerName}` + `${command[i]}`;
-        console.log(playerName)
-      }
-      getMemberStats(message, playerName)
-    } 
-    else {
-      getWeeklyStats(message);
-    }
-  }
-  if (command[0] === "last") {
-    getLastWeekStats(message);
-  }
-  if (command[0] === "record" || command[0] === "records") {
-    getRecordStats(message);
-  }
-  if (command[0] === "startcap") {
-    startCartel(message);
-  }
-  if (command[0] === "endcap") {
-    endCartel(message);
-  }
-  if (command[0] === "iron") {
-    if(command[1]) {
-      checkMemberLedger(message, command[1]);
-    }
-    else {
-      checkIronLedger(message);
-    }
-  }
-  if (command[0] === "test") {
-    //writeGangMemberInfo();
-    checkCapsdata();
-  }
-  if (command[0] === "fetch"){
+  // if (command[0] === "caps") {
+  //   getCaps(message);
+  // }
+  // if (command[0] === "floppa") {
+  //   floppaImg(message);
+  // }
+  // if (command[0] === "help") {
+  //   helpMessage(message);
+  // }
+  // if (command[0] === "gang") {
+  //   if(command[1] === "roster") {
+  //     getRoster(message);
+  //   } else {
+  //     gangEmbed(message);
+  //   }
+  // }
+  // if (command[0] === "stats") {
+  //   if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
+  //     editTracked(message, command[1], command[2]);
+  //   }
+  //   else if(command[1]) {
+  //     var playerName = "";
+  //     for(let i = 1; i < command.length; i++) {
+  //       playerName = `${playerName}` + `${command[i]}`;
+  //       console.log(playerName)
+  //     }
+  //     getMemberStats(message, playerName)
+  //   } 
+  //   else {
+  //     getWeeklyStats(message);
+  //   }
+  // }
+  // if (command[0] === "last") {
+  //   getLastWeekStats(message);
+  // }
+  // if (command[0] === "record" || command[0] === "records") {
+  //   getRecordStats(message);
+  // }
+  // if (command[0] === "startcap") {
+  //   startCartel(message);
+  // }
+  // if (command[0] === "endcap") {
+  //   endCartel(message);
+  // }
+  // if (command[0] === "iron") {
+  //   if(command[1]) {
+  //     checkMemberLedger(message, command[1]);
+  //   }
+  //   else {
+  //     checkIronLedger(message);
+  //   }
+  // }
+  // if (command[0] === "test") {
+  //   //writeGangMemberInfo();
+  //   checkCapsdata();
+  // }
+  // if (command[0] === "fetch"){
     
-    writeGangInfo();
-   }
-  if (command[0] === "update"){
-    updateAllStats();
-  }
+  //   writeGangInfo();
+  //  }
+  // if (command[0] === "update"){
+  //   updateAllStats();
+  // }
 });
 
 //----------- GANG FUNCTION ------------ //
@@ -562,48 +563,149 @@ const getCaps = async (message) => {
   });
 };
 
-// const writeCaps = async () => {
-//   const response = await fetch(
-//     "https://stats.olympus-entertainment.com/api/v3.0/cartels/",
-//     {
-//       headers: {
-//         accept: "application/json",
-//         Authorization:
-//           "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
-//       },
-//     }
-//   );
-//   const json = await response.json().then((cartelInfo) => {
-//     fs.writeFile(
-//       "cartelInfo.json",
-//       JSON.stringify(cartelInfo),
-//       "utf8",
-//       function (err) {
-//         if (err) {
-//           console.log("An error occured while saving cartel info");
-//           return console.log(err);
-//         }
-//         console.log("cartel info updated!")
-//         //checkCaps(cartelInfo);
-//       }
-//     );
-//   });
-// };
+const writeCaps = async () => {
+  const response = await fetch(
+    "https://stats.olympus-entertainment.com/api/v3.0/cartels/",
+    {
+      headers: {
+        accept: "application/json",
+        Authorization:
+          "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
+      },
+    }
+  );
+  const json = await response.json().then((cartelInfo) => {
+    fs.writeFile(
+      "cartelInfo.json",
+      JSON.stringify(cartelInfo),
+      "utf8",
+      function (err) {
+        if (err) {
+          console.log("An error occured while saving cartel info");
+          return console.log(err);
+        }
+        console.log("cartel info updated!")
+        //checkCaps(cartelInfo);
+      }
+    );
+  });
+};
 
-// const checkCaps = async (data) => {
-//   // for(let i = 0; i < data.length; i++) {
-//   //   if(data[i].gang_id === parseInt(gang_id)) {
-//     const channel = client.channels.cache.get(channel_id);
-//     capsData = channel.send("Hello!");
-//     await sleep(300000);
+const checkCaps = async () => {
+  fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
+    if (err) {
+       console.log(err);
+    }
+    else {
+      fs.readFile('./capsData.json', 'utf8', (err, tempCapsData) => {
+        if (err) {
+           console.log(err);
+        }
+        else {
+          let cartelInfo = JSON.parse(tempCartelInfo);
+          let capsData = JSON.parse(tempCapsData);
+  for(let i = 0; i < capsData.length; i++) {
+    for(let j = 0; j < cartelInfo.length; j++) {
+      if(cartelInfo[j].server === capsData[i].server && cartelInfo[j].name === capsData[i].name) {
+        if(cartelInfo[j].gang_id !== gang_id) {
+          lostCap(capsData, i);
+        }
+      }
+    }
+  }
+  for(let i = 0; i < cartelInfo.length; i++) {
+    if(cartelInfo[i].gang === gang_id) {
+      for(let j = 0; j < capsData.length; j++) {
+        if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
+          console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
+        } else {
+          gainedCap(cartelInfo[i].name, cartelInfo[i].server);
+        }
+      }
+    }
+  }
+        }
+      })
+    }
+  });
+}
 
-//     //capsMessage = channel.send('```' + `${data[i].name}` + '```' + ' on ```' + `${data[i].server}` + '``` was taken!  React to this message if you are taking part!');
-//   //   }
-//   // }
-// }
+const gainedCap = async (name, server) => {
+  const channel = client.channels.cache.get(channel_id);
+    //users = [];
+    fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
+      if (err) {
+         console.log(err);
+      }
+      else {
+        fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
+          if (err) {
+             console.log(err);
+          }
+          else {
+    capsData[capsData.length] = {
+      cartel: name,
+      server: server,
+      time: currentDate(0),
+      message: null,
+      users: [],
+    }
+    const embed = new EmbedBuilder()
+      .setColor('0x3b2927')
+      .setTitle('Starting Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
+      .addFields({
+        name: name,
+        value: `Server ${server}`
+      })
+      .setDescription('React to the message if you are involved!');
+    
+    channel.send({embeds : [embed]}).then((embedMsg) => {
+      embedMsg.react("🔺");
 
-const checkCapsdata = () => {
-  
+      capsData[`${name}${server}`].message = embedMsg;
+
+      const participating = new EmbedBuilder()
+      .setColor('0x3b2927')
+      .setTitle('Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
+      .addFields({
+        name: " ",
+        value: " "
+      })
+      .setDescription('The Following are Participants:')
+      .setFooter({
+        text: `${currentDate(2)}`
+      })
+
+      channel.send({ embeds: [participating]}).then( emb => {
+        
+        client.on('messageReactionAdd', (reaction, user) => {
+          if(user.id === embedMsg.author) {return;}
+          if(capsData[`${name}${server}`].message.id === embedMsg.id) {
+            capsData[`${name}${server}`].users.push(user.username);
+
+
+
+            participating.addFields({
+              name: `${user.username}`,
+              value: " ",
+              inline: true
+            })
+
+            emb.edit({ embeds: [participating]})
+          }
+        })
+      })
+    })
+    await sleep(5000);
+
+    capsData[`${name}${server}`].message.delete();
+
+    fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
+
+}
+
+const lostCap = (data, index) => {
+
 }
 
 // -------------- FLOPPA IMG FUNCTION ------------------------------------------------------------------------------------------------------------------------- //
@@ -981,6 +1083,9 @@ const updateAllStats = () => {
 // ----------------- SUPPLIMENTAL FUNCTIONS --------- //
 
 const currentDate = (num) => {
+  if(num === 0) {
+    return Date.now();
+  }
   if(num === 2) {
     var currentdate = new Date();
         var currentHour = currentdate.getHours();
