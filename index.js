@@ -77,7 +77,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    checkCaps();
+    gainedCap();
     //console.log(message);
   }
   // if (command[0] === "caps") {
@@ -631,7 +631,10 @@ const checkCaps = async () => {
   });
 }
 
-const gainedCap = async (name, server) => {
+const gainedCap = async () => {
+  const name = "Arms"
+  const server = "1";
+  var number = null;
   const channel = client.channels.cache.get(channel_id);
     fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
       if (err) {
@@ -643,7 +646,7 @@ const gainedCap = async (name, server) => {
              console.log(err);
           }
           else {
-
+    number = capsData.length;
     capsData[capsData.length] = {
       cartel: name,
       server: server,
@@ -663,7 +666,7 @@ const gainedCap = async (name, server) => {
     channel.send({embeds : [embed]}).then((embedMsg) => {
       embedMsg.react("🔺");
 
-      capsData[`${name}${server}`].message = embedMsg;
+      capsData[number].message = embedMsg;
 
       const participating = new EmbedBuilder()
       .setColor('0x3b2927')
@@ -681,8 +684,8 @@ const gainedCap = async (name, server) => {
         
         client.on('messageReactionAdd', (reaction, user) => {
           if(user.id === embedMsg.author) {return;}
-          if(capsData[`${name}${server}`].message.id === embedMsg.id) {
-            capsData[`${name}${server}`].users.push(user.username);
+          if(capsData[number].message.id === embedMsg.id) {
+            capsData[number].users.push(user.username);
 
 
 
@@ -703,9 +706,9 @@ const gainedCap = async (name, server) => {
       }
     })
 
-    await sleep(5000);
+    await sleep(10000);
 
-    capsData[`${name}${server}`].message.delete();
+    capsData[number].message.delete();
 
     fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
 }
@@ -1067,6 +1070,14 @@ const updateLeaders = (stats, tracked) => {
 }
 
 const updateAllStats = () => {
+  fs.readFile(`./archive/${weekCounter-1}.json`, "utf8", (tempBefore) => {
+    fs.readFile('./gangMembers.json', "utf8", (tempBefore) => {
+      fs.readFile('trackedStats.json', "utf8", (tempTrackedStats) => {
+
+      })
+    })
+  })
+  
   delete require.cache[require.resolve('./archive/0.json')]
   delete require.cache[require.resolve('./gangMembers.json')]
   delete require.cache[require.resolve('./trackedStats.json')]
