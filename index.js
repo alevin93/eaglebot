@@ -26,7 +26,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 
 
 const slayer_id = '209141852849307649';
-const gang_id = '25546'
+const gang_id = 25546
 const channel_id = '1061443428925317213'
 const guild_id = '1061443428392636477'
 const prefix = "!";
@@ -44,25 +44,25 @@ var gangMemberLink =
 // -------------- CRON JOBS ------------- //
 
 //end of week jobs
-cron.schedule("30 * 0 * * 1", () => {
-  startUp();
-  sleep(10000);
-  archiveStats();
-  recordWeekStats();
-})
+// cron.schedule("30 * 0 * * 1", () => {
+//   startUp();
+//   sleep(10000);
+//   archiveStats();
+//   recordWeekStats();
+// })
 
-//constant jobs
-cron.schedule("0 */4 * * * *", () => {
-  writeGangInfo();
-});
+// //constant jobs
+// cron.schedule("0 */4 * * * *", () => {
+//   writeGangInfo();
+// });
 
-cron.schedule("4 */8 * * * *", () => {
-  writeGangMemberInfo();
-});
+// cron.schedule("4 */8 * * * *", () => {
+//   writeGangMemberInfo();
+// });
 
-cron.schedule("8 */8 * * * *", () => {
-  updateAllStats();
-});
+// cron.schedule("8 */8 * * * *", () => {
+//   updateAllStats();
+// });
 
 // cron.schedule("*/1 * * * *", () => {
 //   writeCaps();
@@ -614,8 +614,9 @@ const checkCaps = async () => {
     }
   }
   for(let i = 0; i < cartelInfo.length; i++) {
-    if(cartelInfo[i].gang === gang_id) {
-      for(let j = 0; j < capsData.length; j++) {
+    if(cartelInfo[i].gang_id === gang_id) {
+      for(let j = 0; j <= capsData.length; j++) {
+        console.log("for loop running")
         if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
           console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
         } else {
@@ -632,7 +633,6 @@ const checkCaps = async () => {
 
 const gainedCap = async (name, server) => {
   const channel = client.channels.cache.get(channel_id);
-    //users = [];
     fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
       if (err) {
          console.log(err);
@@ -643,6 +643,7 @@ const gainedCap = async (name, server) => {
              console.log(err);
           }
           else {
+
     capsData[capsData.length] = {
       cartel: name,
       server: server,
@@ -696,12 +697,17 @@ const gainedCap = async (name, server) => {
         })
       })
     })
+
+          }
+        })
+      }
+    })
+
     await sleep(5000);
 
     capsData[`${name}${server}`].message.delete();
 
     fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
-
 }
 
 const lostCap = (data, index) => {
@@ -995,6 +1001,8 @@ const calculateStatistics = (tracked, before, after) => {
       if(!output[j]) { continue; }
       if(output[i].name === output[j].name && output[i].player_id !== output[j].player_id) {
         for(let k = 0; k < tracked.length; k++) {
+          if(output[i].data[tracked[k]] === null) {output[i].data[tracked[k]] = 0};
+          if(output[j].data[tracked[k]] === null) {output[j].data[tracked[k]] = 0};
           output[i].data[tracked[k]] = output[i].data[tracked[k]] + output[j].data[tracked[k]];
         }
         delete output[j];
