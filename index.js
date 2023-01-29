@@ -77,8 +77,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    editTracked(message, command[1], command[2])
-    //console.log(message);
+    gainedCap();
   }
   // if (command[0] === "caps") {
   //   getCaps(message);
@@ -336,10 +335,9 @@ const getRecordStats = (message) => {
 };
 
 const getMemberStats = (message, command) => {
-  delete require.cache[require.resolve('./memberStats.json')];
-  delete require.cache[require.resolve('./trackedStats.json')];
-  const json = require('./memberStats.json');
-  const tracked = require('./trackedStats.json');
+  var json = fs.readFileSync('./memberStats.json', 'utf8');
+  var tracked = fs.ReadFileSync('./trackedStats.json', 'utf8');
+
   var index = null;
   for(let i = 0; i < json.length; i++) {
     if(!json[i]) { continue; }
@@ -372,26 +370,27 @@ const getMemberStats = (message, command) => {
 
 const editTracked = async (message, command, stat) => {
   if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
-    // delete require.cache[require.resolve('./weekCounter.json')];
-    // delete require.cache[require.resolve('./gangMembers.json')];
-    // const weekCounter = require('./weekCounter.json');
-    // const gangMemberFile = require('./gangMembers.json');
-    let weekCounter = fs.readFileSync('./weekCounter.json', 'utf8');
-    let gangMemberFile = fs.readFileSync('./gangMembers.json', 'utf8');
-    var statList = []
+    let weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json', 'utf8'));
+    let gangMemberFile = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+    var statList = [];
     if(command === 'options') {
+      console.log(Object.keys(gangMemberFile[0]).length);
       for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
-        statList[i] = Object.keys(gangMemberFile[0])[i]
+        statList.push('`' + `${Object.keys(gangMemberFile[0])[i]}` + '` - ');
       }
       for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
-        statList[statList.length] = Object.keys(gangMemberFile[0].stats)[i]
+        statList.push('`' + `${Object.keys(gangMemberFile[0].stats)[i]}` + '` - '); 
       }
-      message.channel.send(statList);
+      var optionList = '';
+      for(let i = 0; i < statList.length; i++) {
+        optionList = optionList + statList[i];
+      }
+      console.log(optionList);
+      message.channel.send(optionList);
     }
-    let tracked = fs.readFileSynce('./trackedStats.json', 'utf8');
+    let tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
     let foundFlag = false;
     console.log(weekCounter);
-    delete require.cache[require.resolve(`./archive/${weekCounter[0]}`)];
 
     if(tracked.length > 24) { ( message.channel.send("Maximum amount of stats tracked! :(")) }
     if(command === 'add') {
@@ -592,10 +591,6 @@ const gainedCap = async () => {
       const participating = new EmbedBuilder()
       .setColor('0x3b2927')
       .setTitle('Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
-      .addFields({
-        name: " ",
-        value: " "
-      })
       .setDescription('The Following are Participants:')
       .setFooter({
         text: `${currentDate(2)}`
@@ -605,6 +600,7 @@ const gainedCap = async () => {
         
         client.on('messageReactionAdd', (reaction, user) => {
           if(user.id === embedMsg.author) {return;}
+          if(user.username === 'FloppaBot') { return; }
           if(capsData[number].message.id === embedMsg.id) {
             capsData[number].users.push(user.username);
 
@@ -616,7 +612,26 @@ const gainedCap = async () => {
               inline: true
             })
 
-            emb.edit({ embeds: [participating]})
+            emb.edit({ embeds: [participating]});
+          }
+        })
+        var newEmb = [];
+        var index = 0;
+        client.on('messageReactionRemove', (reaction, user) => {
+          if(capsData[number].message.id === emb.id) {
+            for(let i = 0; i < capsData[number].users.length; i++) {
+              newEmb[i] = new EmbedBuilder()
+                .setColor('0x3b2927')
+                .setTitle('Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
+                .setDescription('The Following are Participants:')
+                .setFooter({
+                  text: `${currentDate(2)}`
+                })
+              if(capsData[number].users[i] === user.username) {
+                capsData[number].users.splice(i, 1);
+                console.log(capsData.users);
+              }
+            }
           }
         })
       })
