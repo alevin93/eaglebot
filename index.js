@@ -44,17 +44,17 @@ var gangMemberLink =
 // -------------- CRON JOBS ------------- //
 
 //end of week jobs
-// cron.schedule("30 0 0 * * 1", () => {
-//   startUp();
-//   sleep(10000);
-//   archiveStats();
-//   recordWeekStats();
-// })
+cron.schedule("30 0 0 * * 1", () => {
+  startUp();
+  sleep(10000);
+  archiveStats();
+  recordWeekStats();
+})
 
 // //constant jobs
-// cron.schedule("0 */4 * * * *", () => {
-//   writeGangInfo();
-// });
+cron.schedule("0 */4 * * * *", () => {
+  writeGangInfo();
+});
 
 cron.schedule("*/1 * * * *", () => {
   writeCaps();
@@ -139,10 +139,10 @@ client.on("messageCreate", (message) => {
   if (command[0] === "fetch"){
     writeGangInfo();
    }
-  if(command[0] === 'archive') {
-    recordWeekStats();
-    archiveStats();
-  }
+  // if(command[0] === 'archive') {
+  //   recordWeekStats();
+  //   archiveStats();
+  // }
 });
 
 //----------- GANG FUNCTION ------------ //
@@ -1155,8 +1155,8 @@ const startUp = async () => {
   const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
   console.log(gangMembers);
   updateAllStats(gangMembers);
-  //writeGangInfo();
-  //writeCaps();
+  writeGangInfo();
+  writeCaps();
 }
 
 function sleep(ms) {
