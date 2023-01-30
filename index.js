@@ -272,9 +272,9 @@ const getLastWeekStats = (message) => {
     }
   }
   const weeklyStatsEmbed = new EmbedBuilder()
-    .setTitle("Daily Stats")
+    .setTitle("Last Weeks Stats")
     .addFields(fields)
-    .setColor(0x591017)
+    .setColor(0xfc6f03)
     .setFooter({
       text: ` `,
     });
@@ -499,7 +499,6 @@ const removeRecord = async (stat) => {
 // ---------- GET CAPS FUNCTION ---------- //
 const getCaps = async (message) => {
   cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
-  console.log(cartelInfo)
   const cartelEmbed = new EmbedBuilder()
     .setTitle(":small_red_triangle: Cartel Status :small_red_triangle: ")
     .addFields(
@@ -644,7 +643,6 @@ const gainedCap = async (name, server) => {
             for(let i = 0; i < capsData[number].users.length; i++) {
               if(capsData[number].users[i] === user.username) {
                 capsData[number].users.splice(i, 1);
-                console.log(capsData.users);
               } else {
                 newEmb.addFields({
                   name: `${capsData[number].users[i]}`,
