@@ -1,3 +1,4 @@
+const { channel } = require("diagnostics_channel");
 const { Client, GatewayIntentBits, EmbedBuilder, InteractionCollector, Intents, interaction, ComponentType } = require("discord.js");
 const fs = require("fs");
 const cron = require("node-cron");
@@ -27,8 +28,7 @@ const formatter = new Intl.NumberFormat("en-US", {
 
 const slayer_id = '209141852849307649';
 const gang_id = 25546
-const channel_id = '1061443428925317213'
-const guild_id = '1061443428392636477'
+const channel_id = '1069447514203361351'
 const prefix = "!";
 
 var capsData = [];
@@ -44,7 +44,7 @@ var gangMemberLink =
 // -------------- CRON JOBS ------------- //
 
 //end of week jobs
-// cron.schedule("30 * 0 * * 1", () => {
+// cron.schedule("30 0 0 * * 1", () => {
 //   startUp();
 //   sleep(10000);
 //   archiveStats();
@@ -56,17 +56,9 @@ var gangMemberLink =
 //   writeGangInfo();
 // });
 
-// cron.schedule("4 */8 * * * *", () => {
-//   writeGangMemberInfo();
-// });
-
-// cron.schedule("8 */8 * * * *", () => {
-//   updateAllStats();
-// });
-
-// cron.schedule("*/1 * * * *", () => {
-//   writeCaps();
-// });
+cron.schedule("*/1 * * * *", () => {
+  writeCaps();
+});
 
 
 // ---------- MAIN FUNCTION ----------- //
@@ -77,49 +69,57 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    gainedCap();
+    console.log(message);
   }
-  // if (command[0] === "caps") {
-  //   getCaps(message);
-  // }
-  // if (command[0] === "floppa") {
-  //   floppaImg(message);
-  // }
-  // if (command[0] === "help") {
-  //   helpMessage(message);
-  // }
-  // if (command[0] === "gang") {
-  //   if(command[1] === "roster") {
-  //     getRoster(message);
-  //   } else {
-  //     gangEmbed(message);
-  //   }
-  // }
-  // if (command[0] === "stats") {
-  //   if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
-  //     editTracked(message, command[1], command[2]);
-  //   }
-  //   else if(command[1]) {
-  //     var playerName = "";
-  //     for(let i = 1; i < command.length; i++) {
-  //       playerName = `${playerName}` + `${command[i]}`;
-  //       console.log(playerName)
-  //     }
-  //     getMemberStats(message, playerName)
-  //   } 
-  //   else {
-  //     getWeeklyStats(message);
-  //   }
-  // }
-  // if (command[0] === "last") {
-  //   getLastWeekStats(message);
-  // }
-  // if (command[0] === "record" || command[0] === "records") {
-  //   getRecordStats(message);
-  // }
-  // if (command[0] === "startcap") {
-  //   startCartel(message);
-  // }
+  if (command[0] === "caps") {
+    getCaps(message);
+  }
+  if (command[0] === "floppa") {
+    floppaImg(message);
+  }
+  if (command[0] === "help") {
+    helpMessage(message);
+  }
+  if (command[0] === "gang") {
+    if(command[1] === "roster") {
+      getRoster(message);
+    } else {
+      gangEmbed(message);
+    }
+  }
+  if (command[0] === "stats") {
+    if(command[1] === "add" || command[1] === "remove" || command[1] === "options") {
+      editTracked(message, command[1], command[2]);
+    }
+    else if(command[1] === "overall") {
+       var playerName = "";
+      for(let i = 2; i < command.length; i++) {
+        playerName = `${playerName}` + `${command[i]}`;
+        console.log(playerName)
+      }
+      getTotalStats(message, playerName)
+    }
+    else if(command[1]) {
+      var playerName = "";
+      for(let i = 1; i < command.length; i++) {
+        playerName = `${playerName}` + `${command[i]}`;
+        console.log(playerName)
+      }
+      getMemberStats(message, playerName)
+    } 
+    else {
+      getWeeklyStats(message);
+    }
+  }
+  if (command[0] === "last") {
+    getLastWeekStats(message);
+  }
+  if (command[0] === "record" || command[0] === "records") {
+    getRecordStats(message);
+  }
+  if (command[0] === "startcap") {
+    message.channel.send("This will now automatically update within a minute after capture.  You'll have 5 minutes to react to it.");
+  }
   // if (command[0] === "endcap") {
   //   endCartel(message);
   // }
@@ -132,16 +132,17 @@ client.on("messageCreate", (message) => {
   //   }
   // }
   // if (command[0] === "test") {
-  //   //writeGangMemberInfo();
-  //   checkCapsdata();
+  //   let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+  //   let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
+  //   lostCap(capsData, 0, cartelInfo);
   // }
-  // if (command[0] === "fetch"){
-    
-  //   writeGangInfo();
-  //  }
-  // if (command[0] === "update"){
-  //   updateAllStats();
-  // }
+  if (command[0] === "fetch"){
+    writeGangInfo();
+   }
+  if(command[0] === 'archive') {
+    recordWeekStats();
+    archiveStats();
+  }
 });
 
 //----------- GANG FUNCTION ------------ //
@@ -234,26 +235,11 @@ const helpMessage = (message) => {
   message.author.send({ embeds: [helpEmbed] });
 };
 
-// --------- POST STATS FUNCTIONS ---------//
+// --------- POST STATS FUNCTIONS ------------------------------------------------------------------------------------POST STATS FUNCTIONS---//
 
 const getWeeklyStats = (message) => {
-  delete require.cache[require.resolve('./weeklyLeaders.json')];
-  delete require.cache[require.resolve('./trackedStats.json')];
-  json = require('./weeklyLeaders.json');
-  const tracked = require('./trackedStats.json');
-  fs.readFile('./weeklyLeaders.json', 'utf8', (err, tempJson) => {
-    if (err) {
-       console.log(err);
-    }
-    else {
-      fs.readFile('./trackedStats.json', 'utf8', (err, tempTracked) => {
-        if (err) {
-           console.log(err);
-        }
-        else {
-
-          const json = JSON.parse(tempJson);
-          const tracked = JSON.parse(tempTracked);
+  const json = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
+  const tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
   console.log(json);
   console.log(tracked);
   //building fields
@@ -276,20 +262,15 @@ const getWeeklyStats = (message) => {
     });
   console.log("Get Weekly Stats Run.");
   message.channel.send({ embeds: [weeklyStatsEmbed] });
-        }
-      })
-    }
-  })
 };
 
 const getLastWeekStats = (message) => {
-  delete require.cache[require.resolve('./lastWeekLeaders.json')];
-  delete require.cache[require.resolve('./trackedStats.json')];
-  const json = require('./lastWeekLeaders.json');
-  const tracked = require('./trackedStats.json');
+  const json = JSON.parse(fs.readFileSync('./lastWeekLeaders.json','utf8'));
+  const tracked = JSON.parse(fs.readFileSync('./trackedStats.json','utf8'));
   //building fields
   fields = []
   for(let i = 0; i < tracked.length; i++) {
+    if(!json[tracked[i]]) { continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
       value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
@@ -301,29 +282,26 @@ const getLastWeekStats = (message) => {
     .addFields(fields)
     .setColor(0x591017)
     .setFooter({
-      text: ``,
+      text: ` `,
     });
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 };
 
 const getRecordStats = (message) => {
-  delete require.cache[require.resolve('./weeklyLeaders.json')];
-  delete require.cache[require.resolve('./trackedStats.json')];
-  delete require.cache[require.resolve('./recordsArchive.json')];
-  const json = require('./weeklyLeaders.json');
-  const tracked = require('./trackedStats.json');
-  const records = require('./recordsArchive.json');
-  //building fields
-  fields = []
-  counter = 0;
+  const json = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
+  const tracked = JSON.parse(fs.readFileSync('./trackedStats.json'));
+  
+  var fields = [];
+
   for(let i = 0; i < tracked.length; i++) {
-    if(!json[tracked[i]].holder || !json[tracked[i]].value) { continue; }
+    if(!json[tracked[i]]) { return; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: `${json[tracked[i]].holder}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].record) : json[tracked[i]].record}` + '```',
+      value: `${json[tracked[i]].holder}`+'```' + `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].record) : json[tracked[i]].record}` + '```',
       inline: true
-    }
+    } 
   }
+
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle("One Week Highs")
     .addFields(fields)
@@ -335,8 +313,8 @@ const getRecordStats = (message) => {
 };
 
 const getMemberStats = (message, command) => {
-  var json = fs.readFileSync('./memberStats.json', 'utf8');
-  var tracked = fs.ReadFileSync('./trackedStats.json', 'utf8');
+  var json = JSON.parse(fs.readFileSync('./memberStats.json', 'utf8'));
+  var tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
 
   var index = null;
   for(let i = 0; i < json.length; i++) {
@@ -350,10 +328,14 @@ const getMemberStats = (message, command) => {
   counter = 0;
   if(index === null) { message.channel.send("No player by that name found.  Make sure you have it exactly right!"); return; }
   for(let i = 0; i < tracked.length; i++) {
-    if(!json[index].data) { continue; }
+    if(json[index].data[tracked[i]] === null) { fields[i] = {
+      name: " ",
+      value: " ",
+      inline: true
+    } ; continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: '```' + `${tracked[i] === 'bank'? formatter.format(json[index].data[tracked[i]]) : json[index].data[tracked[i]]}` + '```',
+      value: '```' + `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[index].data[tracked[i]]) : json[index].data[tracked[i]]}` + '```',
       inline: true
     }
   }
@@ -368,13 +350,67 @@ const getMemberStats = (message, command) => {
   message.channel.send({ embeds: [weeklyStatsEmbed] });
 }
 
+const getTotalStats = (message, command) => {
+  var json = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+  var tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
+  console.log(command);
+  var index = null;
+  for(let i = 0; i < json.length; i++) {
+    if(!json[i].name) { continue; }
+    if(json[i].name.toLowerCase().replace(/\s/g, '') === command.toLowerCase().replace(/\s/g, '')) {
+      index = i;
+      console.log(index);
+    }
+  }
+  //building fields
+  fields = []
+  counter = 0;
+  if(index === null) { message.channel.send("No player by that name found.  Make sure you have it exactly right!"); return; }
+  for(let i = 0; i < tracked.length; i++) {
+    if(json[index][tracked[i]]) {
+      fields[i] = {
+        name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+        value: '```' + `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[index][tracked[i]]) : json[index][tracked[i]]}` + '```',
+        inline: true
+      }
+    } 
+    else if (json[index].stats[tracked[i]]) {
+      fields[i] = {
+        name: `${tracked[i].toUpperCase().replace('_',' ')}`,
+        value: '```' + `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[index].stats[tracked[i]]) : json[index].stats[tracked[i]]}` + '```',
+        inline: true
+      }
+      
+    } else {
+      fields[i] = {
+        name: ' ',
+        value: ' ',
+        inline: true
+      }
+    }
+  }
+  const weeklyStatsEmbed = new EmbedBuilder()
+    .setTitle(`${json[index].name}'s Overall Stats`)
+    .addFields(fields)
+    .setColor(0x0f14b8)
+    .setFooter({
+      text: `Last Update: ${gmUpdated}`,
+    });
+  message.channel.send({ embeds: [weeklyStatsEmbed] });
+}
+
 const editTracked = async (message, command, stat) => {
   if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
     let weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json', 'utf8'));
     let gangMemberFile = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
     var statList = [];
+    for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
+      statList.push(`${Object.keys(gangMemberFile[0])[i]}`);
+    }
+    for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
+      statList.push(`${Object.keys(gangMemberFile[0].stats)[i]}`); 
+    }
     if(command === 'options') {
-      console.log(Object.keys(gangMemberFile[0]).length);
       for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
         statList.push('`' + `${Object.keys(gangMemberFile[0])[i]}` + '` - ');
       }
@@ -394,7 +430,10 @@ const editTracked = async (message, command, stat) => {
 
     if(tracked.length > 24) { ( message.channel.send("Maximum amount of stats tracked! :(")) }
     if(command === 'add') {
+      console.log(command + " commanded, stat is " + stat);
+      console.log(statList);
       for(let i = 0; i < statList.length; i++) {
+        console.log(stat.toLowerCase().replace(/[^\w\s]/gi, '') + " VS " + statList[i].toLowerCase().replace(/[^\w\s]/gi, ''))
         if(stat.toLowerCase().replace(/[^\w\s]/gi, '') === statList[i].toLowerCase().replace(/[^\w\s]/gi, '')) {
           tracked[tracked.length] = statList[i];
           message.channel.send(stat + " is now being tracked");
@@ -436,8 +475,8 @@ const editTracked = async (message, command, stat) => {
 
 const removeRecord = async (stat) => {
 
-  let leaders = fs.readFileSync('./weeklyLeaders.json', 'utf8');
-  let archive = fs.readFileSync('./recordsArchive.json', 'utf8');
+  let leaders = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
+  let archive = JSON.parse(fs.readFileSync('./recordsArchive.json', 'utf8'));
 
   if(archive[stat]) {
     if(archive[stat].value < leaders[stat].record) {
@@ -473,7 +512,8 @@ const removeRecord = async (stat) => {
 
 // ---------- GET CAPS FUNCTION ---------- //
 const getCaps = async (message) => {
-  cartelInfo = fs.readFileSync('./cartelInfo.json', 'utf8');
+  cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
+  console.log(cartelInfo)
   const cartelEmbed = new EmbedBuilder()
     .setTitle(":small_red_triangle: Cartel Status :small_red_triangle: ")
     .addFields(
@@ -515,7 +555,7 @@ const writeCaps = async () => {
           return console.log(err);
         }
         console.log("cartel info updated!")
-        //checkCaps(cartelInfo);
+        checkCaps(cartelInfo);
       }
     );
   });
@@ -524,15 +564,15 @@ const writeCaps = async () => {
 const checkCaps = async (cartelInfoFile) => {
   let cartelInfo = cartelInfoFile;
   if(!cartelInfo) {
-    let cartelInfo = fs.readFileSync('./cartelInfo.json', 'utf8');
+    let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
   }
-  let capsData = fs.readFile('./capsData.json', 'utf8');
+  let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
 
   for(let i = 0; i < capsData.length; i++) {
     for(let j = 0; j < cartelInfo.length; j++) {
       if(cartelInfo[j].server === capsData[i].server && cartelInfo[j].name === capsData[i].name) {
         if(cartelInfo[j].gang_id !== gang_id) {
-          lostCap(capsData, i);
+          lostCap(capsData, i, cartelInfo);
         }
       }
     }
@@ -540,7 +580,6 @@ const checkCaps = async (cartelInfoFile) => {
   for(let i = 0; i < cartelInfo.length; i++) {
     if(cartelInfo[i].gang_id === gang_id) {
       for(let j = 0; j <= capsData.length; j++) {
-        console.log("for loop running")
         if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
           console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
         } else {
@@ -551,36 +590,26 @@ const checkCaps = async (cartelInfoFile) => {
   }
 }
 
-const gainedCap = async () => {
-  const name = "Arms"
-  const server = "1";
+const gainedCap = async (name, server) => {
   var number = null;
   const channel = client.channels.cache.get(channel_id);
-    fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
-      if (err) {
-         console.log(err);
-      }
-      else {
-        fs.readFile('./cartelInfo.json', 'utf8', (err, tempCartelInfo) => {
-          if (err) {
-             console.log(err);
-          }
-          else {
+    let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+    let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
+
+    if(capsData[0]) { return; }  //we only need one cap data
+
     number = capsData.length;
     capsData[capsData.length] = {
       cartel: name,
       server: server,
-      time: currentDate(0),
+      time: currentDate(2),
+      starting: gangInfo.bank,
       message: null,
       users: [],
     }
     const embed = new EmbedBuilder()
       .setColor('0x3b2927')
-      .setTitle('Starting Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
-      .addFields({
-        name: name,
-        value: `Server ${server}`
-      })
+      .setTitle('Starting Caps')
       .setDescription('React to the message if you are involved!');
     
     channel.send({embeds : [embed]}).then((embedMsg) => {
@@ -590,7 +619,7 @@ const gainedCap = async () => {
 
       const participating = new EmbedBuilder()
       .setColor('0x3b2927')
-      .setTitle('Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
+      .setTitle('Starting Caps at ```' + formatter.format(gangInfo.bank) + '```')
       .setDescription('The Following are Participants:')
       .setFooter({
         text: `${currentDate(2)}`
@@ -615,42 +644,82 @@ const gainedCap = async () => {
             emb.edit({ embeds: [participating]});
           }
         })
-        var newEmb = [];
+        
         var index = 0;
         client.on('messageReactionRemove', (reaction, user) => {
-          if(capsData[number].message.id === emb.id) {
-            for(let i = 0; i < capsData[number].users.length; i++) {
-              newEmb[i] = new EmbedBuilder()
+          var newEmb = new EmbedBuilder()
                 .setColor('0x3b2927')
-                .setTitle('Capture of ```' + `${name}` + '``` on server ```' + `${server}` + '```')
+                .setTitle('Starting Caps')
                 .setDescription('The Following are Participants:')
                 .setFooter({
                   text: `${currentDate(2)}`
                 })
+          if(capsData[number].message.id === emb.id) {
+            for(let i = 0; i < capsData[number].users.length; i++) {
               if(capsData[number].users[i] === user.username) {
                 capsData[number].users.splice(i, 1);
                 console.log(capsData.users);
+              } else {
+                newEmb.addFields({
+                  name: `${capsData[number].users[i]}`,
+                  value: ""
+                })
               }
             }
           }
+          emb.edit({ embed: [newEmb]})
         })
       })
     })
 
-          }
-        })
-      }
-    })
-
-    await sleep(10000);
+    await sleep(300000);
 
     capsData[number].message.delete();
 
     fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
 }
 
-const lostCap = (data, index) => {
+const lostCap = (data, index, cartelInfo) => {
+  if(!data[index]) { 
+    return;
+  }
+  const channel = client.channels.cache.get(channel_id);
+  let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json', 'utf8'));
+  let totalGained = gangInfo.bank - data[index].starting;
 
+  
+
+  for(let i = 0; i < cartelInfo.length; i++) {
+    if(cartelInfo[i].gang_id === gang_id) {
+      return;
+    }
+  }
+
+  let fields = [];
+  for(let i = 0; i < data[index].users.length; i++) {
+    if(data[index].users[i] === 'FloppaBot') { data[index].users.pop(i); }
+    fields[i] = {
+      name: `${data[index].users[i]}`,
+      value: ' ',
+      inline: true
+    }
+  }
+  payout = ((totalGained*.9) / data[index].users.length);
+  const participating = new EmbedBuilder()
+      .setColor('0x3b2927')
+      .setTitle('Lost Caps at ```' + formatter.format(gangInfo.bank) + '```')
+      .setDescription('Total Gained: ```' + formatter.format(totalGained) + '```  Payout per person: ```' + formatter.format(payout) + '```  The Following Players Are Included: ')
+      .addFields(fields)
+      .setFooter({
+        text: `${data[index].time} to ${currentDate(2)}`
+      })
+  
+  channel.send({embeds : [participating]});
+
+  data = [];
+
+  fs.writeFileSync('./capsData.json', JSON.stringify(data), 'utf8');
+  
 }
 
 // -------------- FLOPPA IMG FUNCTION ------------------------------------------------------------------------------------------------------------------------- //
@@ -717,7 +786,7 @@ const writeGangInfo = async () => {
 
 const writeGangMemberInfo = async (gangInfo) => {
     let gangInfoFile = gangInfo;
-    if(!gangInfoFile) {
+    if(!gangInfoFile.members) {
       let gangInfoFile = fs.readFileSync('./gangInfo.json', 'utf8');
     }
 
@@ -776,10 +845,8 @@ const updateMemberStats = (results) => {
 }
 
 const archiveStats = () => {
-  delete require.cache[require.resolve('./gangMembers.json')];
-  delete require.cache[require.resolve('./weekCounter.json')];
-  const gangMemberFile = require('./gangMembers.json');
-  const weekNumber = require('./weekCounter.json');
+  const gangMemberFile = JSON.parse(fs.readFileSync('./gangMembers.json','utf8'));
+  const weekNumber = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
   fs.writeFileSync(
     `./archive/${weekCounter}.json`,
     JSON.stringify(gangMemberFile),
@@ -912,9 +979,10 @@ const checkMemberLedger = (message, name) => {
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
 const recordWeekStats = () => {
-  delete require.cache[require.resolve('./weeklyLeaders.json')];
-  const leaders = require('./weeklyLeaders.json');
-  fs.writeFile(
+  var leaders = JSON.parse(fs.readFileSync('./weeklyLeaders.json','utf8'));
+  const tracked = JSON.parse(fs.readFileSync('./trackedStats.json','utf8'));
+  var archive = JSON.parse(fs.readFileSync('./recordsArchive.json', 'utf8'));
+  fs.writeFileSync(
     "./lastWeekLeaders.json",
     JSON.stringify(leaders),
     'utf8',
@@ -927,6 +995,26 @@ const recordWeekStats = () => {
       }
     }    
   );
+  for(let i = 0; i < tracked.length; i++) {
+    if(archive[tracked[i]]) {
+      if(archive[tracked[i]].value < leaders[tracked[i]].record) {
+        archive[tracked[i]].value = leaders[tracked[i]].record;
+        archive[tracked[i]].name = leaders[tracked[i]].holder;
+      }
+    } else {
+      rec = {
+        'name': `${leaders[tracked[i]].name}`,
+        'value': `${leaders[tracked[i]].record}`
+      }
+      archive[tracked[i]] = rec;
+    }
+  }
+  fs.writeFileSync(
+    "recordsArchive.json",
+    JSON.stringify(archive),
+    "utf8");
+  leaders = {};
+  fs.writeFileSync('./weeklyLeaders.json', JSON.stringify(leaders),'utf8');
 }
 
 const calculateStatistics = (tracked, before, after) => {
@@ -966,14 +1054,9 @@ const calculateStatistics = (tracked, before, after) => {
 }
 
 const updateLeaders = (stats, tracked) => {
-  leaderboard = null;
-  try {
-    delete require.cache[require.resolve('./weeklyLeaders.json')];
-    var leaderboard = require('./weeklyLeaders.json');
-  } catch (err) { console.log(err); }
-  if(!leaderboard) { leaderboard = {};}
-  delete require.cache[require.resolve('./recordsArchive.json')];
-  let archive = require('./recordsArchive.json');
+  let leaderboard = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
+  let archive = JSON.parse(fs.readFileSync('./recordsArchive.json', 'utf8'));
+
   for(let i = 0; i < stats.length; i++) {
     if(!stats[i]) { continue; }
     for(let j = 0; j < tracked.length; j++) {
@@ -1013,14 +1096,9 @@ const updateLeaders = (stats, tracked) => {
 
 const updateAllStats = (gangMembers) => {
   let weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json', 'utf8'))[0];
-  console.log(weekCounter);
-  let before = fs.readFileSync(`./archive/${weekCounter-1}.json`, "utf8");
+  let before = JSON.parse(fs.readFileSync(`./archive/${weekCounter-1}.json`, "utf8"));
   let after = gangMembers;
-  if(!gangMembers) {
-    fs.readFileSync('gangMembers.json', 'utf8');
-  }
-  let tracked = fs.readFileSync('trackedStats.json', "utf8");
-  
+  let tracked = JSON.parse(fs.readFileSync('trackedStats.json', "utf8"));
 
   result = calculateStatistics(tracked, before, after);
   updateLeaders(result, tracked);
@@ -1071,10 +1149,14 @@ const currentDate = (num) => {
 }
 
 const startUp = async () => {
-  week = fs.readFileSync('./weekCounter.json', 'utf8');
+  week = JSON.parse(fs.readFileSync('./weekCounter.json', 'utf8'));
   weekCounter = week[0];
-  //validateFiles();
+  validateFiles();
+  const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+  console.log(gangMembers);
+  updateAllStats(gangMembers);
   //writeGangInfo();
+  //writeCaps();
 }
 
 function sleep(ms) {
@@ -1086,7 +1168,7 @@ function sleep(ms) {
 const validateFiles = () => {
   var gangInfo = null;
   try {
-    gangInfo = require('./gangInfo.json')
+    gangInfo = fs.readFileSync('./gangInfo.json', 'utf8')
   } catch (err) {
     console.log("No Gang Info File detected");
   }
@@ -1105,12 +1187,9 @@ const validateFiles = () => {
       }    
     );
   }
-  if(require.cache[require.resolve('./gangInfo.json')]) {
-    delete require.cache[require.resolve('./gangInfo.json')]
-  }
   var gangMembers = null;
   try {
-    gangMembers = require('./gangMembers.json')
+    gangMembers = fs.readFileSync('./gangMembers.json', 'utf8')
   } catch (err) {
     console.log("No Gang Members File detected");
   }
@@ -1129,12 +1208,9 @@ const validateFiles = () => {
       }    
     );
   }
-  if(require.cache[require.resolve('./gangMembers.json')]) {
-    delete require.cache[require.resolve('./gangMembers.json')]
-  }
   var memberStats = null;
   try {
-    memberStats = require('./memberStats.json')
+    memberStats = fs.readFileSync('./memberStats.json', 'utf8')
   } catch (err) {
     console.log("No member stats file detected");  
   }
@@ -1153,12 +1229,9 @@ const validateFiles = () => {
       }    
     );
   }
-  if(require.cache[require.resolve('./memberStats.json')]) {
-    delete require.cache[require.resolve('./memberStats.json')]
-  }
   var tracked = null;
   try {
-    tracked = require('./trackedStats.json')
+    tracked = fs.readFileSync('./trackedStats.json', 'utf8');
   } catch (err) {
     console.log("No tracked stats file detected");  
   }
@@ -1177,13 +1250,9 @@ const validateFiles = () => {
       }    
     );
   }
-  if(require.cache[require.resolve('./trackedStats.json')]) {
-    delete require.cache[require.resolve('./trackedStats.json')]
-  }
-
   var weekly = null;
   try {
-    weekly = require('./weeklyLeaders.json')
+    weekly = fs.readFileSync('./weeklyLeaders.json', 'utf8')
   } catch (err) {
     console.log("No weekly leader file detected");  
   }
@@ -1202,13 +1271,10 @@ const validateFiles = () => {
       }    
     );
   }
-  if(require.cache[require.resolve('./weeklyLeaders.json')]) {
-    delete require.cache[require.resolve('./weeklyLeaders.json')]
-  }
 
   var archive = null;
   try {
-    archive = require('./recordsArchive.json')
+    archive = fs.readFileSync('./recordsArchive.json', 'utf8')
   } catch (err) {
     console.log("No records archive file detected");  
   }
@@ -1226,9 +1292,6 @@ const validateFiles = () => {
         }
       }    
     );
-  }
-  if(require.cache[require.resolve('./recordsArchive.json')]) {
-    delete require.cache[require.resolve('./recordsArchive.json')]
   }
 }
 

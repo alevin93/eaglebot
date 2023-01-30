@@ -1,2 +1,56 @@
 {
+    "kills": {
+        "name": "I LOVE GARY",
+        "value": 147,
+        "record": 147,
+        "holder": "I LOVE GARY"
+    },
+    "players_robbed": {
+        "name": "CYAN",
+        "value": 25,
+        "record": 25,
+        "holder": "CYAN"
+    },
+    "deaths": {
+        "name": "Logan Stash",
+        "value": 220,
+        "record": 220,
+        "holder": "Logan Stash"
+    },
+    "bank": {
+        "name": "mudiwa",
+        "value": 17852080,
+        "record": 17852080,
+        "holder": "mudiwa"
+    },
+    "ticket_vals": {
+        "name": "Carl",
+        "value": 310000,
+        "record": 310000,
+        "holder": "Carl"
+    },
+    "playtime_civ": {
+        "name": "I LOVE GARY",
+        "value": 2562,
+        "record": 2562,
+        "holder": "I LOVE GARY"
+    },
+    "playtime_cop": {
+        "name": "Josh (2)",
+        "value": 358,
+        "record": 358,
+        "holder": "Josh (2)"
+    },
+    "cop_kills": {
+        "name": "MBPslyr",
+        "value": 27,
+        "record": 27,
+        "holder": "MBPslyr"
+    },
+    "playtime_med": {
+        "name": "TEH",
+        "value": 1422,
+        "record": 1422,
+        "holder": "TEH"
+    }
 }
