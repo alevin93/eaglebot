@@ -1153,8 +1153,6 @@ const startUp = async () => {
   weekCounter = week[0];
   validateFiles();
   const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
-  console.log(gangMembers);
-  updateAllStats(gangMembers);
   writeGangInfo();
   writeCaps();
 }
