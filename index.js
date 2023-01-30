@@ -243,7 +243,7 @@ const getWeeklyStats = (message) => {
     if(!json[tracked[i]]) { continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
+      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
       inline: true
     }
   }
@@ -267,7 +267,7 @@ const getLastWeekStats = (message) => {
     if(!json[tracked[i]]) { continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
+      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
       inline: true
     }
   }
@@ -291,7 +291,7 @@ const getRecordStats = (message) => {
     if(!json[tracked[i]]) { return; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: `${json[tracked[i]].holder}`+'```' + `${tracked[i] === 'bank'? formatter.format(json[tracked[i]].record) : json[tracked[i]].record}` + '```',
+      value: `${json[tracked[i]].holder}`+'```' + `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[tracked[i]].record) : json[tracked[i]].record}` + '```',
       inline: true
     } 
   }
