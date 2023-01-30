@@ -95,7 +95,6 @@ client.on("messageCreate", (message) => {
        var playerName = "";
       for(let i = 2; i < command.length; i++) {
         playerName = `${playerName}` + `${command[i]}`;
-        console.log(playerName)
       }
       getTotalStats(message, playerName)
     }
@@ -103,7 +102,6 @@ client.on("messageCreate", (message) => {
       var playerName = "";
       for(let i = 1; i < command.length; i++) {
         playerName = `${playerName}` + `${command[i]}`;
-        console.log(playerName)
       }
       getMemberStats(message, playerName)
     } 
@@ -179,7 +177,6 @@ const gangEmbed = (message) => {
 const getRoster = (message, command) => {
   fs.readFile('./memberStats.json', 'utf8', (err, data) => {
     const members = JSON.parse(data);
-    console.log(members.length);
     var roster = [];
     for(let i = 0; i < members.length; i++) {
       if(!members[i] || members[i] === "") { continue; }
@@ -188,7 +185,6 @@ const getRoster = (message, command) => {
         roster.pop(i);
       }
     }
-    console.log(roster);
     message.channel.send(roster);
   });
 }
@@ -240,8 +236,6 @@ const helpMessage = (message) => {
 const getWeeklyStats = (message) => {
   const json = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
   const tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
-  console.log(json);
-  console.log(tracked);
   //building fields
   fields = []
   counter = 0;
@@ -339,7 +333,6 @@ const getMemberStats = (message, command) => {
       inline: true
     }
   }
-  console.log(fields);
   const weeklyStatsEmbed = new EmbedBuilder()
     .setTitle(`${json[index].name}'s Weekly Stats`)
     .addFields(fields)
@@ -353,13 +346,11 @@ const getMemberStats = (message, command) => {
 const getTotalStats = (message, command) => {
   var json = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
   var tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
-  console.log(command);
   var index = null;
   for(let i = 0; i < json.length; i++) {
     if(!json[i].name) { continue; }
     if(json[i].name.toLowerCase().replace(/\s/g, '') === command.toLowerCase().replace(/\s/g, '')) {
       index = i;
-      console.log(index);
     }
   }
   //building fields
@@ -421,19 +412,14 @@ const editTracked = async (message, command, stat) => {
       for(let i = 0; i < statList.length; i++) {
         optionList = optionList + statList[i];
       }
-      console.log(optionList);
       message.channel.send(optionList);
     }
     let tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
     let foundFlag = false;
-    console.log(weekCounter);
 
     if(tracked.length > 24) { ( message.channel.send("Maximum amount of stats tracked! :(")) }
     if(command === 'add') {
-      console.log(command + " commanded, stat is " + stat);
-      console.log(statList);
       for(let i = 0; i < statList.length; i++) {
-        console.log(stat.toLowerCase().replace(/[^\w\s]/gi, '') + " VS " + statList[i].toLowerCase().replace(/[^\w\s]/gi, ''))
         if(stat.toLowerCase().replace(/[^\w\s]/gi, '') === statList[i].toLowerCase().replace(/[^\w\s]/gi, '')) {
           tracked[tracked.length] = statList[i];
           message.channel.send(stat + " is now being tracked");
