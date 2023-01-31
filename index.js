@@ -768,7 +768,7 @@ const writeGangMemberInfo = async (gangInfo) => {
     gangMemberInfoCounter++;
     let gangInfoFile = gangInfo;
     if(!gangInfoFile.members) {
-      let gangInfoFile = fs.readFileSync('./gangInfo.json', 'utf8');
+      let gangInfoFilef = fs.readFileSync('./gangInfo.json', 'utf8');
     }
 
     
@@ -790,7 +790,7 @@ const writeGangMemberInfo = async (gangInfo) => {
       });
       const json = await response.json().then((gangMembers) => {
 
-        if(gangMembers[message]) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
+        if(gangMembers?.message) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
         fs.writeFileSync(
           "gangMembers.json",
           JSON.stringify(gangMembers),
