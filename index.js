@@ -765,7 +765,7 @@ const writeGangInfo = async () => {
 var gangMemberInfoCounter = 0;
 
 const writeGangMemberInfo = async (gangInfo) => {
-    gangInfoCounter++;
+    gangMemberInfoCounter++;
     let gangInfoFile = gangInfo;
     if(!gangInfoFile.members) {
       let gangInfoFile = fs.readFileSync('./gangInfo.json', 'utf8');
