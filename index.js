@@ -56,7 +56,7 @@ cron.schedule("0 */5 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("0 */1.25 * * * *", () => {
+cron.schedule("0 */2 * * * *", () => {
   writeCaps();
 });
 
@@ -499,6 +499,7 @@ const removeRecord = async (stat) => {
 // ---------- GET CAPS FUNCTION ---------- //
 const getCaps = async (message) => {
   cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
+  if(!cartelInfo[0].gang_name) { message.channel.send("Error Occurred.  API issues.  Try again later"); return;}
   const cartelEmbed = new EmbedBuilder()
     .setTitle(":small_red_triangle: Cartel Status :small_red_triangle: ")
     .addFields(
