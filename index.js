@@ -52,11 +52,11 @@ cron.schedule("30 0 0 * * 1", () => {
 })
 
 // //constant jobs
-cron.schedule("0 */4 * * * *", () => {
+cron.schedule("0 */5 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("0 */1.25 * * * *", () => {
   writeCaps();
 });
 
@@ -564,14 +564,8 @@ const checkCaps = async (cartelInfoFile) => {
   }
   for(let i = 0; i < cartelInfo.length; i++) {
     if(cartelInfo[i].gang_id === gang_id) {
-      for(let j = 0; j <= capsData.length; j++) {
-        if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
-          console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
-        } else {
           gainedCap(cartelInfo[i].name, cartelInfo[i].server);
-        }
       }
-    }
   }
 }
 
@@ -768,7 +762,10 @@ const writeGangInfo = async () => {
   });
 };
 
+var gangMemberInfoCounter = 0;
+
 const writeGangMemberInfo = async (gangInfo) => {
+    gangInfoCounter++;
     let gangInfoFile = gangInfo;
     if(!gangInfoFile.members) {
       let gangInfoFile = fs.readFileSync('./gangInfo.json', 'utf8');
@@ -792,7 +789,8 @@ const writeGangMemberInfo = async (gangInfo) => {
         },
       });
       const json = await response.json().then((gangMembers) => {
-        if(gangMembers['errors']) { writeGangInfo().then(() => { writeGangMemberInfo();})}
+
+        if(gangMembers[message]) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
         fs.writeFileSync(
           "gangMembers.json",
           JSON.stringify(gangMembers),
@@ -808,6 +806,7 @@ const writeGangMemberInfo = async (gangInfo) => {
             gmUpdated = currentDate(2);
           }
         );
+        console.log("GangMemberInfo has been run: " + gangMemberInfoCounter + " times");
         updateAllStats(gangMembers);
       });
       
