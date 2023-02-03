@@ -44,7 +44,7 @@ var gangMemberLink =
 
 // -------------- CRON JOBS ------------- //
 
-end of week jobs
+//end of week jobs
 cron.schedule("30 0 0 * * 1", () => {
   startUp();
   sleep(10000);
@@ -57,11 +57,7 @@ cron.schedule("0 */5 * * * *", () => {
   writeGangInfo();
 });
 
-<<<<<<< HEAD
-cron.schedule("*/15 * * * * *", () => {
-=======
 cron.schedule("0 */2 * * * *", () => {
->>>>>>> 70118b0c9ccba7adec1a3841c329793bbe5becb5
   writeCaps();
   checkCaps();
 });
@@ -552,7 +548,6 @@ const writeCaps = async () => {
   });
 };
 
-<<<<<<< HEAD
 // const checkCaps = async (cartelInfoFile) => {
 //   let cartelInfo = cartelInfoFile;
 //   if(!cartelInfo) {
@@ -603,52 +598,6 @@ const writeCaps = async () => {
 //       .setColor('0x3b2927')
 //       .setTitle('Starting Caps')
 //       .setDescription('React to the message if you are involved!');
-=======
-const checkCaps = async (cartelInfoFile) => {
-  let cartelInfo = cartelInfoFile;
-  if(!cartelInfo) {
-    let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
-  }
-  let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
-
-  for(let i = 0; i < capsData.length; i++) {
-    for(let j = 0; j < cartelInfo.length; j++) {
-      if(cartelInfo[j].server === capsData[i].server && cartelInfo[j].name === capsData[i].name) {
-        if(cartelInfo[j].gang_id !== gang_id) {
-          lostCap(capsData, i, cartelInfo);
-        }
-      }
-    }
-  }
-  for(let i = 0; i < cartelInfo.length; i++) {
-    if(cartelInfo[i].gang_id === gang_id) {
-          gainedCap(cartelInfo[i].name, cartelInfo[i].server);
-      }
-  }
-}
-
-const gainedCap = async (name, server) => {
-  var number = null;
-  const channel = client.channels.cache.get(channel_id);
-    let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
-    let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
-
-    if(capsData[0]) { return; }  //we only need one cap data
-
-    number = capsData.length;
-    capsData[capsData.length] = {
-      cartel: name,
-      server: server,
-      time: currentDate(2),
-      starting: gangInfo.bank,
-      message: null,
-      users: [],
-    }
-    const embed = new EmbedBuilder()
-      .setColor('0x3b2927')
-      .setTitle('Starting Caps')
-      .setDescription('React to the message if you are involved!');
->>>>>>> 70118b0c9ccba7adec1a3841c329793bbe5becb5
     
 //     channel.send({embeds : [embed]}).then((embedMsg) => {
 //       embedMsg.react("🔺");
