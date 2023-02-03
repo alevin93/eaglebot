@@ -59,7 +59,6 @@ cron.schedule("0 */5 * * * *", () => {
 
 cron.schedule("0 */2 * * * *", () => {
   writeCaps();
-  checkCaps();
 });
 
 
@@ -131,11 +130,9 @@ client.on("messageCreate", (message) => {
   //     checkIronLedger(message);
   //   }
   // }
-  // if (command[0] === "test") {
-  //   let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
-  //   let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
-  //   lostCap(capsData, 0, cartelInfo);
-  // }
+  if (command[0] === "test") {
+    
+  }
   // if (command[0] === "fetch"){
   //   writeGangInfo();
   //  }
@@ -542,7 +539,8 @@ const writeCaps = async () => {
           console.log("An error occured while saving cartel info");
           return console.log(err);
         }
-        console.log("cartel info updated!")
+        console.log("cartel info updated!");
+        checkCaps(cartelInfo);
       }
     );
   });
@@ -851,9 +849,9 @@ const endCap = (message) => {
   fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8' )
 }
 
-const checkCaps = () => {
+const checkCaps = (cartelInfo) => {
+  if(!cartelInfo || cartelInfo.error) { console.log("An error occured with Check Caps because there is no Cartel Info"); return; }
   let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
-  let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
   var cartelFlag = false;
 
   if(capsData.startAmount || capsData.startTime) {
@@ -960,6 +958,7 @@ const writeGangMemberInfo = async (gangInfo) => {
       const json = await response.json().then((gangMembers) => {
 
         if(gangMembers?.message) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
+        if(gangMembers?.error) { console.log("Invalid players something"); return; }
         fs.writeFileSync(
           "gangMembers.json",
           JSON.stringify(gangMembers),
