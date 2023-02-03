@@ -1,3 +1,4 @@
+const { time } = require("console");
 const { channel } = require("diagnostics_channel");
 const { Client, GatewayIntentBits, EmbedBuilder, InteractionCollector, Intents, interaction, ComponentType } = require("discord.js");
 const fs = require("fs");
@@ -31,11 +32,11 @@ const gang_id = 25546
 const channel_id = '1069447514203361351'
 const prefix = "!";
 
-var capsData = [];
+// var capsData = {};
 
 var giUpdated = null;
 var gmUpdated = null;
-var startingAmount = 1;
+var startingAmount = 0;
 var splitFlag = false;
 var participants = [];
 var gangMemberLink =
@@ -43,7 +44,7 @@ var gangMemberLink =
 
 // -------------- CRON JOBS ------------- //
 
-//end of week jobs
+end of week jobs
 cron.schedule("30 0 0 * * 1", () => {
   startUp();
   sleep(10000);
@@ -52,12 +53,13 @@ cron.schedule("30 0 0 * * 1", () => {
 })
 
 // //constant jobs
-cron.schedule("0 */4 * * * *", () => {
+cron.schedule("0 */5 * * * *", () => {
   writeGangInfo();
 });
 
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("*/15 * * * * *", () => {
   writeCaps();
+  checkCaps();
 });
 
 
@@ -116,11 +118,11 @@ client.on("messageCreate", (message) => {
     getRecordStats(message);
   }
   if (command[0] === "startcap") {
-    message.channel.send("This will now automatically update within a minute after capture.  You'll have 5 minutes to react to it.");
+    startCap(message);
   }
-  // if (command[0] === "endcap") {
-  //   endCartel(message);
-  // }
+  if (command[0] === "endcap") {
+    endCap(message);
+  }
   // if (command[0] === "iron") {
   //   if(command[1]) {
   //     checkMemberLedger(message, command[1]);
@@ -134,9 +136,9 @@ client.on("messageCreate", (message) => {
   //   let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
   //   lostCap(capsData, 0, cartelInfo);
   // }
-  if (command[0] === "fetch"){
-    writeGangInfo();
-   }
+  // if (command[0] === "fetch"){
+  //   writeGangInfo();
+  //  }
   // if(command[0] === 'archive') {
   //   recordWeekStats();
   //   archiveStats();
@@ -540,170 +542,330 @@ const writeCaps = async () => {
           return console.log(err);
         }
         console.log("cartel info updated!")
-        checkCaps(cartelInfo);
       }
     );
   });
 };
 
-const checkCaps = async (cartelInfoFile) => {
-  let cartelInfo = cartelInfoFile;
-  if(!cartelInfo) {
-    let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
-  }
-  let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+// const checkCaps = async (cartelInfoFile) => {
+//   let cartelInfo = cartelInfoFile;
+//   if(!cartelInfo) {
+//     let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
+//   }
+//   let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
 
-  for(let i = 0; i < capsData.length; i++) {
-    for(let j = 0; j < cartelInfo.length; j++) {
-      if(cartelInfo[j].server === capsData[i].server && cartelInfo[j].name === capsData[i].name) {
-        if(cartelInfo[j].gang_id !== gang_id) {
-          lostCap(capsData, i, cartelInfo);
-        }
-      }
-    }
-  }
-  for(let i = 0; i < cartelInfo.length; i++) {
-    if(cartelInfo[i].gang_id === gang_id) {
-      for(let j = 0; j <= capsData.length; j++) {
-        if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
-          console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
-        } else {
-          gainedCap(cartelInfo[i].name, cartelInfo[i].server);
-        }
-      }
-    }
-  }
-}
+//   for(let i = 0; i < capsData.length; i++) {
+//     for(let j = 0; j < cartelInfo.length; j++) {
+//       if(cartelInfo[j].server === capsData[i].server && cartelInfo[j].name === capsData[i].name) {
+//         if(cartelInfo[j].gang_id !== gang_id) {
+//           lostCap(capsData, i, cartelInfo);
+//         }
+//       }
+//     }
+//   }
+//   for(let i = 0; i < cartelInfo.length; i++) {
+//     if(cartelInfo[i].gang_id === gang_id) {
+//       for(let j = 0; j <= capsData.length; j++) {
+//         if(cartelInfo[i].server === capsData[j].server && cartelInfo[i].name === capsData[j].name) {
+//           console.log(`Holding ${capsData[j].name} cartel on server ${capsData[j].server}`)
+//         } else {
+//           gainedCap(cartelInfo[i].name, cartelInfo[i].server);
+//         }
+//       }
+//     }
+//   }
+// }
 
-const gainedCap = async (name, server) => {
-  var number = null;
-  const channel = client.channels.cache.get(channel_id);
-    let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
-    let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
+// const gainedCap = async (name, server) => {
+//   var number = null;
+//   const channel = client.channels.cache.get(channel_id);
+//     let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+//     let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
 
-    if(capsData[0]) { return; }  //we only need one cap data
+//     if(capsData[0]) { return; }  //we only need one cap data
 
-    number = capsData.length;
-    capsData[capsData.length] = {
-      cartel: name,
-      server: server,
-      time: currentDate(2),
-      starting: gangInfo.bank,
-      message: null,
-      users: [],
-    }
-    const embed = new EmbedBuilder()
-      .setColor('0x3b2927')
-      .setTitle('Starting Caps')
-      .setDescription('React to the message if you are involved!');
+//     number = capsData.length;
+//     capsData[capsData.length] = {
+//       cartel: name,
+//       server: server,
+//       time: currentDate(2),
+//       starting: gangInfo.bank,
+//       message: null,
+//       users: [],
+//     }
+//     const embed = new EmbedBuilder()
+//       .setColor('0x3b2927')
+//       .setTitle('Starting Caps')
+//       .setDescription('React to the message if you are involved!');
     
-    channel.send({embeds : [embed]}).then((embedMsg) => {
-      embedMsg.react("🔺");
+//     channel.send({embeds : [embed]}).then((embedMsg) => {
+//       embedMsg.react("🔺");
 
-      capsData[number].message = embedMsg;
+//       capsData[number].message = embedMsg;
 
-      const participating = new EmbedBuilder()
-      .setColor('0x3b2927')
-      .setTitle('Starting Caps at ```' + formatter.format(gangInfo.bank) + '```')
-      .setDescription('The Following are Participants:')
-      .setFooter({
-        text: `${currentDate(2)}`
-      })
+//       const participating = new EmbedBuilder()
+//       .setColor('0x3b2927')
+//       .setTitle('Starting Caps at ```' + formatter.format(gangInfo.bank) + '```')
+//       .setDescription('The Following are Participants:')
+//       .setFooter({
+//         text: `${currentDate(2)}`
+//       })
 
-      channel.send({ embeds: [participating]}).then( emb => {
+//       channel.send({ embeds: [participating]}).then( emb => {
         
-        client.on('messageReactionAdd', (reaction, user) => {
-          if(user.id === embedMsg.author) {return;}
-          if(user.username === 'FloppaBot') { return; }
-          if(capsData[number].message.id === embedMsg.id) {
-            capsData[number].users.push(user.username);
+//         client.on('messageReactionAdd', (reaction, user) => {
+//           if(user.id === embedMsg.author) {return;}
+//           if(user.username === 'FloppaBot') { return; }
+//           if(capsData[number].message.id === embedMsg.id) {
+//             capsData[number].users.push(user.username);
 
 
 
-            participating.addFields({
-              name: `${user.username}`,
-              value: " ",
-              inline: true
-            })
+//             participating.addFields({
+//               name: `${user.username}`,
+//               value: " ",
+//               inline: true
+//             })
 
-            emb.edit({ embeds: [participating]});
-          }
-        })
+//             emb.edit({ embeds: [participating]});
+//           }
+//         })
         
-        var index = 0;
-        client.on('messageReactionRemove', (reaction, user) => {
-          var newEmb = new EmbedBuilder()
-                .setColor('0x3b2927')
-                .setTitle('Starting Caps')
-                .setDescription('The Following are Participants:')
-                .setFooter({
-                  text: `${currentDate(2)}`
-                })
-          if(capsData[number].message.id === emb.id) {
-            for(let i = 0; i < capsData[number].users.length; i++) {
-              if(capsData[number].users[i] === user.username) {
-                capsData[number].users.splice(i, 1);
-              } else {
-                newEmb.addFields({
-                  name: `${capsData[number].users[i]}`,
-                  value: ""
-                })
-              }
-            }
-          }
-          emb.edit({ embed: [newEmb]})
-        })
-      })
-    })
+//         var index = 0;
+//         client.on('messageReactionRemove', (reaction, user) => {
+//           var newEmb = new EmbedBuilder()
+//                 .setColor('0x3b2927')
+//                 .setTitle('Starting Caps')
+//                 .setDescription('The Following are Participants:')
+//                 .setFooter({
+//                   text: `${currentDate(2)}`
+//                 })
+//           if(capsData[number].message.id === emb.id) {
+//             for(let i = 0; i < capsData[number].users.length; i++) {
+//               if(capsData[number].users[i] === user.username) {
+//                 capsData[number].users.splice(i, 1);
+//               } else {
+//                 newEmb.addFields({
+//                   name: `${capsData[number].users[i]}`,
+//                   value: ""
+//                 })
+//               }
+//             }
+//           }
+//           emb.edit({ embed: [newEmb]})
+//         })
+//       })
+//     })
 
-    await sleep(300000);
+//     await sleep(300000);
 
-    capsData[number].message.delete();
+//     capsData[number].message.delete();
 
-    fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
-}
+//     fs.writeFile('./capsData.json', JSON.stringify(capsData), "utf8", () => {});
+// }
 
-const lostCap = (data, index, cartelInfo) => {
-  if(!data[index]) { 
-    return;
-  }
-  const channel = client.channels.cache.get(channel_id);
-  let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json', 'utf8'));
-  let totalGained = gangInfo.bank - data[index].starting;
+// const lostCap = (data, index, cartelInfo) => {
+//   if(!data[index]) { 
+//     return;
+//   }
+//   const channel = client.channels.cache.get(channel_id);
+//   let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json', 'utf8'));
+//   let totalGained = gangInfo.bank - data[index].starting;
 
   
 
-  for(let i = 0; i < cartelInfo.length; i++) {
-    if(cartelInfo[i].gang_id === gang_id) {
-      return;
-    }
+//   for(let i = 0; i < cartelInfo.length; i++) {
+//     if(cartelInfo[i].gang_id === gang_id) {
+//       return;
+//     }
+//   }
+
+//   let fields = [];
+//   for(let i = 0; i < data[index].users.length; i++) {
+//     if(data[index].users[i] === 'FloppaBot') { data[index].users.pop(i); }
+//     fields[i] = {
+//       name: `${data[index].users[i]}`,
+//       value: ' ',
+//       inline: true
+//     }
+//   }
+//   payout = ((totalGained*.9) / data[index].users.length);
+//   const participating = new EmbedBuilder()
+//       .setColor('0x3b2927')
+//       .setTitle('Lost Caps at ```' + formatter.format(gangInfo.bank) + '```')
+//       .setDescription('Total Gained: ```' + formatter.format(totalGained) + '```  Payout per person: ```' + formatter.format(payout) + '```  The Following Players Are Included: ')
+//       .addFields(fields)
+//       .setFooter({
+//         text: `${data[index].time} to ${currentDate(2)}`
+//       })
+  
+//   channel.send({embeds : [participating]});
+
+//   data = [];
+
+//   fs.writeFileSync('./capsData.json', JSON.stringify(data), 'utf8');
+  
+// }
+
+const startCap = (message) => {
+  let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
+  let oldCapsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+  if(oldCapsData.startAmount || oldCapsData.startTime) { message.channel.send('Theres already a cap going on.  Join that one by reacting to the emote.'); return; }
+
+  var capsData = {
+    startTime: currentDate(2),
+    startAmount: gangInfo.bank,
+    message: null,
+    participating: []
   }
 
-  let fields = [];
-  for(let i = 0; i < data[index].users.length; i++) {
-    if(data[index].users[i] === 'FloppaBot') { data[index].users.pop(i); }
+  var capEmbed = new EmbedBuilder()
+  .setColor(0x000000)
+  .setTitle('Starting Caps at ```' + `${formatter.format(gangInfo.bank)}` + '```')
+  .addFields({
+    name: 'The Following Are Participants: ',
+    value: ' '
+  })
+  .setFooter({ text: "React to this if you're joining"})
+
+  message.channel.send({ embeds: [capEmbed]}).then(emb => {
+    emb.react("🔺");
+
+    capsData.message = emb;
+
+    client.on('messageReactionAdd', (reaction, user) => {
+      if(user.id === emb.author) {return;}
+      if(user.username === 'FloppaBot') { return; }
+      var fields = [];
+      participants.push(user.username);
+      for(let i = 0; i < participants.length; i++) {
+        fields[i] = {
+          name: participants[i],
+          value: " ",
+          inline: true
+        }
+      }
+      var newEmb = new EmbedBuilder()
+      .setColor(0x000000)
+      .setTitle('Starting Caps at ```' + `${formatter.format(gangInfo.bank)}` + '```')
+      .addFields({
+        name: 'The Following Are Participants: ',
+        value: ' '
+      })
+      .setFooter({ text: "React to this if you're joining"})
+      .addFields(fields)
+
+      capsData.participating.push(user.username);
+
+      fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8' );
+
+      emb.edit({ embeds: [newEmb]});
+    })
+    client.on('messageReactionRemove', (reaction, user) => {
+      var temp = []
+      var index = null;
+      var fields = [];
+      if(user.id === emb.author) {return;}
+      if(user.username === 'FloppaBot') { return; }
+      for(let i = 0; i < participants.length; i++) {
+        if(user.username === participants[i]) {
+          index = i;
+        } else {
+          fields[i] = {
+            name: participants[i],
+            value: " ",
+            inline: true
+          }
+          temp[i] = participants[i];
+        }
+      }
+      if(index !== null) {
+        participants.splice(index, 1);
+      }
+      capsData.participating = temp;
+
+      var newEmb = new EmbedBuilder()
+      .setColor(0x000000)
+      .setTitle('Starting Caps at ```' + `${formatter.format(gangInfo.bank)}` + '```')
+      .addFields({
+        name: 'The Following Are Participants: ',
+        value: ' '
+      })
+      .setFooter({ text: "React to this if you're joining"})
+      .addFields(fields);
+
+      fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8');
+
+      emb.edit({ embeds: [newEmb]});
+    })
+  })
+}
+
+const endCap = (message) => {
+  let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
+  let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+
+  var chan = null;
+
+  if(message) { 
+    chan = message.channel;
+  } else {
+    chan = client.channels.cache.get(channel_id);
+  }
+
+  var fields = [];
+  var numberParticipants = capsData.participating.length
+  console.log(message)
+  if (numberParticipants === 0) { 
+    numberParticipants = 1;
+  }
+
+  for(let i = 0; i < capsData.participating.length; i++) {
     fields[i] = {
-      name: `${data[index].users[i]}`,
+      name: `${capsData.participating[i]}`,
       value: ' ',
       inline: true
     }
   }
-  payout = ((totalGained*.9) / data[index].users.length);
-  const participating = new EmbedBuilder()
-      .setColor('0x3b2927')
-      .setTitle('Lost Caps at ```' + formatter.format(gangInfo.bank) + '```')
-      .setDescription('Total Gained: ```' + formatter.format(totalGained) + '```  Payout per person: ```' + formatter.format(payout) + '```  The Following Players Are Included: ')
-      .addFields(fields)
-      .setFooter({
-        text: `${data[index].time} to ${currentDate(2)}`
-      })
-  
-  channel.send({embeds : [participating]});
 
-  data = [];
+  var newEmb = new EmbedBuilder()
+    .setColor(0x000000)
+    .setTitle('Ending Caps at ```' + `${formatter.format(gangInfo.bank)}` + '```')
+    .addFields(
+      {
+        name: 'Total Gained was ```' + `${formatter.format(gangInfo.bank - capsData.startAmount)}` + '```',
+        value: ' '
+      },
+      {
+        name: 'Each players cut is ```' + `${formatter.format(((gangInfo.bank - capsData.startAmount)*0.9)/numberParticipants)}` + '```',
+        value: ' '
+      }
+    )
+    .addFields(fields);
 
-  fs.writeFileSync('./capsData.json', JSON.stringify(data), 'utf8');
-  
+  chan.send({ embeds: [newEmb] })
+
+  participants = [];
+  capsData = {};
+  fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8' )
+}
+
+const checkCaps = () => {
+  let capsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
+  let cartelInfo = JSON.parse(fs.readFileSync('./cartelInfo.json', 'utf8'));
+  var cartelFlag = false;
+
+  if(capsData.startAmount || capsData.startTime) {
+    for(let i = 0; i < cartelInfo.length; i++) {
+      if(cartelInfo[i].gang_id === gang_id) {
+        cartelFlag = true;
+      }
+    }
+    console.log(cartelFlag === false);
+    if(cartelFlag === false) {
+      endCap();
+    }
+  }
 }
 
 // -------------- FLOPPA IMG FUNCTION ------------------------------------------------------------------------------------------------------------------------- //
@@ -868,43 +1030,6 @@ const archiveStats = () => {
 
 //----------- Cartel Split Function --------//
 
-const startCartel = async (message) => {
-  delete require.cache[require.resolve('./gangInfo.json')];
-  let gangInfoFile = require('./gangInfo.json');
-  startingAmt = gangInfoFile.bank;
-  message.channel.send(
-    "Starting cartels at $" + startingAmt + " react if participating."
-  );
-  message.react("👍");
-
-  client.on("messageReactionAdd", (reaction, user) => {
-    participants.push(`${user}`);
-  });
-  const filter = (reaction, user) => {
-    return ["👍"].includes(reaction.emoji.name);
-  };
-  message
-    .awaitReactions(filter, { max: 100, time: 900000 })
-    .then((collected) => {
-      console.log(participants);
-    })
-    .catch((collected) => {
-      console.log("Error during caps split function");
-    });
-};
-
-const endCartel = async (message) => {
-  delete require.cache[require.resolve('./gangInfo.json')];
-  let gangInfoFile = require('./gangInfo.json');
-  const endingAmt = gangInfoFile.bank;
-  message.channel.send(
-    "Split from cartels is $" +
-      Math.round(((endingAmt - startingAmt) *.9) / (participants.length - 1)) +
-      " each"
-  );
-  startingAmt = 1;
-  participants = [];
-};
 
 // ----------- IRON CHAT COMMANDS ------------------ //
 
