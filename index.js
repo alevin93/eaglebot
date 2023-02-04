@@ -1075,7 +1075,52 @@ const checkMemberLedger = (message, name) => {
   
 }
 
-//
+// ------------------------ TAX CALCULATION ------------------------//
+
+const calculateTax = () => {
+  const weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
+  const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+  const taxed = JSON.parse(fs.readFileSync('./taxedStats.json','utf8'));
+  const before = JSON.parse(fs.readFileSync(`./archive/${weekCounter - 1}.json`));
+ 
+  const result = calculateStatistics(taxed, before, gangMembers);
+ 
+  for(let i = 0; i < result.length; i++) {
+   for(var key in result.data) {
+     if(results[i].data[key] === 0) {
+       delete result[i].data[key];
+     }
+   }
+   if(Object.keys(result[i].data).length === 0) {
+     results[i].pop();
+   }
+  }
+  fs.writeFileSync('./taxStats.json', JSON.stringify(result), 'utf8');
+ }
+ 
+ const updateTax = (taxed, stats) => {
+  const ledger = JSON.parse(fs.readFileSync('./ledger.json','utf8'));
+  for(let i = 0; i < stats.length; i++);
+    for(var x in stats[i].data) {
+      var rec = {}
+      if(ledger[stats[i].name]) {
+        rec = ledger[stats[i]]
+      } else {
+        rec = {
+          name: stats[i].name,
+          owed: null,
+          ledger: {},
+        }
+      }
+      for(let j = 0; j < taxed.length; j++) {
+        if(rec.data[taxed[i].name]) {
+          rec.data[taxed]
+        }
+      }
+    }
+     
+}
+
 
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
 
@@ -1391,6 +1436,25 @@ const validateFiles = () => {
         }
       }    
     );
+  }
+
+  var taxed = null;
+  try {
+    taxed = fs.readFileSync('./taxedStats.json','utf8');
+  } catch (err) {
+    console.log("No taxed file found!");
+  }
+  if(!taxed) {
+    fs.writeFileSync('./taxedStats.json', JSON.stringify([{ name: 'iron_sold', tax: 1900 }]), 'utf8');
+  }
+  var ledger = null;
+  try {
+    ledger = fs.readFileSync('./ledger.json','utf8');
+  } catch (err) {
+    console.log("No taxed stats file found");
+  }
+  if(!ledger) {
+    fs.writeFileSync('./ledger.json', JSON.stringify([]), 'utf8')
   }
 }
 

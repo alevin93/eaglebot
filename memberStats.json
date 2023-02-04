@@ -63,12 +63,12 @@
         "name": "Mayo7.62",
         "player_id": "76561198038047063",
         "data": {
-            "kills": 0,
+            "kills": 21,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 14,
+            "bank": 11664904,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1570,
             "playtime_cop": 0,
             "cop_kills": 0,
             "playtime_med": 0
@@ -90,47 +90,47 @@
         }
     },
     {
-        "name": "Pleighboi",
+        "name": "Mikey Millions",
         "player_id": "76561198052836617",
         "data": {
-            "kills": 0,
+            "kills": 7,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 14,
+            "bank": -5491443,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 990,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 1,
             "playtime_med": 0
         }
     },
     {
-        "name": "known fragger nman",
+        "name": "nman!",
         "player_id": "76561198053427338",
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 1,
-            "bank": 45500,
+            "deaths": 10,
+            "bank": -68049,
             "ticket_vals": 0,
-            "playtime_civ": 40,
+            "playtime_civ": 166,
             "playtime_cop": 0,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 103
         }
     },
     {
         "name": "Carl",
         "player_id": "76561198054977802",
         "data": {
-            "kills": 0,
+            "kills": 4,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 6,
+            "bank": 74840,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
+            "playtime_civ": 92,
+            "playtime_cop": 38,
+            "cop_kills": 1,
             "playtime_med": 0
         }
     },
@@ -183,28 +183,28 @@
         "name": "mitch",
         "player_id": "76561198083907370",
         "data": {
-            "kills": 0,
+            "kills": 11,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 11,
+            "bank": -289216,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 278,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 3,
             "playtime_med": null
         }
     },
     {
-        "name": "KudosTV",
+        "name": "DrYooHoo",
         "player_id": "76561198084286154",
         "data": {
-            "kills": 0,
+            "kills": 7,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 6,
+            "bank": -837827,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
+            "playtime_civ": 212,
+            "playtime_cop": 68,
             "cop_kills": 0,
             "playtime_med": 0
         }
@@ -213,14 +213,14 @@
         "name": "Price",
         "player_id": "76561198084480662",
         "data": {
-            "kills": 0,
+            "kills": 4,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 26,
+            "bank": 13726752,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 655,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 1,
             "playtime_med": null
         }
     },
@@ -245,10 +245,10 @@
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 2,
+            "bank": -1824612,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 59,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -275,42 +275,27 @@
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
+            "deaths": 1,
             "bank": 0,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 10,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
         }
     },
     {
-        "name": "Apollyon",
-        "player_id": "76561198095396521",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": 0
-        }
-    },
-    {
         "name": "COLT45",
         "player_id": "76561198105404143",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 33,
+            "players_robbed": 1,
+            "deaths": 36,
+            "bank": -4681074,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1488,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 6,
             "playtime_med": null
         }
     },
@@ -318,14 +303,14 @@
         "name": "rich homie quan",
         "player_id": "76561198105801599",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 15,
+            "players_robbed": 1,
+            "deaths": 10,
+            "bank": -1698776,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 486,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 3,
             "playtime_med": null
         }
     },
@@ -345,45 +330,15 @@
         }
     },
     {
-        "name": "Colby..",
-        "player_id": "76561198116998516",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": 0
-        }
-    },
-    {
-        "name": "Doofy",
-        "player_id": "76561198120571112",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": 0
-        }
-    },
-    {
         "name": "mudiwa",
         "player_id": "76561198123439780",
         "data": {
-            "kills": 0,
+            "kills": 3,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 3,
+            "bank": -1829704,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 290,
             "playtime_cop": 0,
             "cop_kills": 0,
             "playtime_med": 0
@@ -393,17 +348,18 @@
         "name": "concussion man",
         "player_id": "76561198124894277",
         "data": {
-            "kills": 0,
+            "kills": 6,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 19,
+            "bank": -1022487,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 426,
             "playtime_cop": 0,
-            "cop_kills": 0,
+            "cop_kills": 1,
             "playtime_med": 0
         }
     },
+    null,
     {
         "name": "Aztrunawt",
         "player_id": "76561198128880845",
@@ -438,15 +394,15 @@
         "name": "Scribble",
         "player_id": "76561198134692123",
         "data": {
-            "kills": 0,
+            "kills": 3,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 56,
+            "bank": -5024336,
             "ticket_vals": 0,
             "playtime_civ": 0,
-            "playtime_cop": 0,
+            "playtime_cop": 777,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 142
         }
     },
     {
@@ -456,9 +412,9 @@
             "kills": 0,
             "players_robbed": 0,
             "deaths": 0,
-            "bank": 0,
+            "bank": -284515,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 29,
             "playtime_cop": 0,
             "cop_kills": 0,
             "playtime_med": 0
@@ -468,12 +424,12 @@
         "name": "Ahmed Buite",
         "player_id": "76561198138204423",
         "data": {
-            "kills": 0,
+            "kills": 1,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 2,
+            "bank": -4146827,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 53,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -500,55 +456,25 @@
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 2,
+            "bank": 978194,
             "ticket_vals": 0,
             "playtime_civ": 0,
             "playtime_cop": 0,
             "cop_kills": 0,
-            "playtime_med": 0
-        }
-    },
-    {
-        "name": "I LOVE GARY",
-        "player_id": "76561198145194661",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": null
-        }
-    },
-    {
-        "name": "Churchill",
-        "player_id": "76561198145195630",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": null
+            "playtime_med": 167
         }
     },
     {
         "name": "Tommy Shelby",
         "player_id": "76561198152914674",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 5,
+            "players_robbed": 2,
+            "deaths": 15,
+            "bank": 19455696,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1048,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -577,13 +503,13 @@
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 8,
+            "bank": 1337350,
             "ticket_vals": 0,
             "playtime_civ": 0,
             "playtime_cop": null,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 366
         }
     },
     {
@@ -620,12 +546,12 @@
         "name": "eXcision",
         "player_id": "76561198185352358",
         "data": {
-            "kills": 0,
+            "kills": 14,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 10,
+            "bank": -4928006,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 666,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -646,32 +572,33 @@
             "playtime_med": null
         }
     },
+    null,
     {
         "name": "Toast",
         "player_id": "76561198199293091",
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 16,
+            "bank": 1942750,
             "ticket_vals": 0,
             "playtime_civ": 0,
             "playtime_cop": null,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 380
         }
     },
     {
         "name": "Darkness",
         "player_id": "76561198216834527",
         "data": {
-            "kills": 0,
+            "kills": 8,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 2,
+            "bank": 1549776,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
+            "playtime_civ": 227,
+            "playtime_cop": 19,
             "cop_kills": 0,
             "playtime_med": 0
         }
@@ -682,10 +609,10 @@
         "data": {
             "kills": 0,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 14,
+            "bank": 416350,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 619,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -722,18 +649,18 @@
         }
     },
     {
-        "name": "djMuhammad",
+        "name": "Djmahhamad",
         "player_id": "76561198253774291",
         "data": {
-            "kills": 0,
+            "kills": 29,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 48,
+            "bank": 2811193,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 2890,
             "playtime_cop": null,
-            "cop_kills": 0,
-            "playtime_med": null
+            "cop_kills": 3,
+            "playtime_med": 139
         }
     },
     {
@@ -755,12 +682,12 @@
         "name": "Nikki6WithDa7",
         "player_id": "76561198272061841",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 4,
+            "players_robbed": 1,
+            "deaths": 16,
+            "bank": -1674290,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 614,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
@@ -797,31 +724,16 @@
         }
     },
     {
-        "name": "reskn",
-        "player_id": "76561198274133266",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": null
-        }
-    },
-    {
-        "name": "200m AK spray",
+        "name": "Insert Emo Name Here",
         "player_id": "76561198286723143",
         "data": {
-            "kills": 0,
+            "kills": 7,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 9,
+            "bank": 27824,
             "ticket_vals": 0,
             "playtime_civ": 0,
-            "playtime_cop": 0,
+            "playtime_cop": 135,
             "cop_kills": 0,
             "playtime_med": 0
         }
@@ -872,21 +784,6 @@
         }
     },
     {
-        "name": "BroFix",
-        "player_id": "76561198314040264",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 2,
-            "bank": -162055,
-            "ticket_vals": 0,
-            "playtime_civ": 10,
-            "playtime_cop": null,
-            "cop_kills": 0,
-            "playtime_med": null
-        }
-    },
-    {
         "name": "Serry",
         "player_id": "76561198314682812",
         "data": {
@@ -905,14 +802,14 @@
         "name": "Josh",
         "player_id": "76561198329190949",
         "data": {
-            "kills": 0,
+            "kills": 22,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 69,
+            "bank": -1525805,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
+            "playtime_civ": 595,
+            "playtime_cop": 357,
+            "cop_kills": 5,
             "playtime_med": null
         }
     },
@@ -935,15 +832,15 @@
         "name": "TEH",
         "player_id": "76561198352972077",
         "data": {
-            "kills": 0,
+            "kills": 3,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 28,
+            "bank": 1787906,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 251,
             "playtime_cop": null,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 684
         }
     },
     null,
@@ -966,14 +863,14 @@
         "name": "J Money",
         "player_id": "76561198367759549",
         "data": {
-            "kills": 0,
+            "kills": 28,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 27,
+            "bank": 1572276,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 532,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 1,
             "playtime_med": null
         }
     },
@@ -996,15 +893,15 @@
         "name": "SpecTGV",
         "player_id": "76561198398252001",
         "data": {
-            "kills": 0,
+            "kills": 45,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 51,
+            "bank": 7522695,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_civ": 472,
+            "playtime_cop": 263,
+            "cop_kills": 9,
+            "playtime_med": 10
         }
     },
     {
@@ -1037,6 +934,7 @@
             "playtime_med": 0
         }
     },
+    null,
     {
         "name": "Mikado",
         "player_id": "76561198799342912",
@@ -1056,45 +954,31 @@
         "name": "Logan Stash",
         "player_id": "76561198807569853",
         "data": {
-            "kills": 0,
+            "kills": 11,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 65,
+            "bank": 23810055,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
+            "playtime_civ": 158,
+            "playtime_cop": 508,
             "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_med": 117
         }
     },
+    null,
     {
-        "name": "StraightAngle",
-        "player_id": "76561198928567429",
-        "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": null,
-            "cop_kills": 0,
-            "playtime_med": null
-        }
-    },
-    {
-        "name": "crack baby",
+        "name": "Socks",
         "player_id": "76561198963919903",
         "data": {
-            "kills": 0,
+            "kills": 19,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 66,
+            "bank": 12921638,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": 0,
-            "cop_kills": 0,
-            "playtime_med": 0
+            "playtime_civ": 278,
+            "playtime_cop": 344,
+            "cop_kills": 4,
+            "playtime_med": 152
         }
     },
     {
@@ -1116,14 +1000,14 @@
         "name": "CYAN",
         "player_id": "76561198970874545",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 17,
+            "players_robbed": 1,
+            "deaths": 20,
+            "bank": 2801988,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 513,
             "playtime_cop": 0,
-            "cop_kills": 0,
+            "cop_kills": 2,
             "playtime_med": null
         }
     },
@@ -1146,30 +1030,30 @@
         "name": "Wolfe [E is Silent]",
         "player_id": "76561199051652500",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 18,
+            "players_robbed": 1,
+            "deaths": 23,
+            "bank": -358096,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 247,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": 0
         }
     },
     {
-        "name": "Zombie Mall Cop",
+        "name": "I NEED MONEY",
         "player_id": "76561199058226379",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 81,
+            "players_robbed": 11,
+            "deaths": 41,
+            "bank": -1384144,
             "ticket_vals": 0,
-            "playtime_civ": 0,
-            "playtime_cop": null,
+            "playtime_civ": 1066,
+            "playtime_cop": 63,
             "cop_kills": 0,
-            "playtime_med": null
+            "playtime_med": 0
         }
     },
     null,
@@ -1177,14 +1061,14 @@
         "name": "Doke",
         "player_id": "76561199069613406",
         "data": {
-            "kills": 0,
+            "kills": 5,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
-            "ticket_vals": 0,
-            "playtime_civ": 0,
+            "deaths": 2,
+            "bank": -1659018,
+            "ticket_vals": 185000,
+            "playtime_civ": 186,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 3,
             "playtime_med": null
         }
     },
@@ -1192,29 +1076,30 @@
         "name": "king",
         "player_id": "76561199106059794",
         "data": {
-            "kills": 0,
+            "kills": 2,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 8,
+            "bank": 880969,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1054,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
         }
     },
+    null,
     {
         "name": "Dr.CoomGoblin",
         "player_id": "76561199128265243",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 77,
+            "players_robbed": 9,
+            "deaths": 26,
+            "bank": -2098456,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1174,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 8,
             "playtime_med": null
         }
     },
@@ -1264,17 +1149,17 @@
         }
     },
     {
-        "name": "Ron",
+        "name": "I Take Kidneys",
         "player_id": "76561199147112085",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 60,
+            "players_robbed": 6,
+            "deaths": 39,
+            "bank": -3398704,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 1344,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 11,
             "playtime_med": null
         }
     },
@@ -1297,12 +1182,12 @@
         "name": "Moonini",
         "player_id": "76561199218744663",
         "data": {
-            "kills": 0,
+            "kills": 11,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 14,
+            "bank": 729042,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 281,
             "playtime_cop": 0,
             "cop_kills": 0,
             "playtime_med": null
@@ -1343,29 +1228,29 @@
         "name": "FAIL RP DONT CRY",
         "player_id": "76561199228930384",
         "data": {
-            "kills": 0,
+            "kills": 1,
             "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "deaths": 3,
+            "bank": 1162365,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 182,
             "playtime_cop": null,
             "cop_kills": 0,
             "playtime_med": null
         }
     },
     {
-        "name": "stupid vigi",
+        "name": "NOT JAILBAIT",
         "player_id": "76561199232910349",
         "data": {
-            "kills": 0,
-            "players_robbed": 0,
-            "deaths": 0,
-            "bank": 0,
+            "kills": 13,
+            "players_robbed": 2,
+            "deaths": 9,
+            "bank": -2267650,
             "ticket_vals": 0,
-            "playtime_civ": 0,
+            "playtime_civ": 256,
             "playtime_cop": null,
-            "cop_kills": 0,
+            "cop_kills": 2,
             "playtime_med": null
         }
     },
@@ -1383,6 +1268,5 @@
             "cop_kills": 0,
             "playtime_med": null
         }
-    },
-    null
+    }
 ]
