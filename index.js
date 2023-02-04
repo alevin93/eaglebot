@@ -914,12 +914,12 @@ const writeGangInfo = async () => {
           console.log("An error occured while writing JSON to File");
           return console.log(err);
         }
-        giUpdated = currentDate(2);
         gangMemberLink =
           "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
         console.log("gangInfo.json updated");
       }
     );
+    giUpdated = currentDate(2);
     if (gangInfoFlag) {
       writeGangMemberInfo(gangInfo);
       gangInfoFlag = false;
@@ -956,24 +956,12 @@ const writeGangMemberInfo = async (gangInfo) => {
         },
       });
       const json = await response.json().then((gangMembers) => {
-
+        console.log(gangMembers);
         if(gangMembers?.message) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
         if(gangMembers?.error) { console.log("Invalid players something"); return; }
-        fs.writeFileSync(
-          "gangMembers.json",
-          JSON.stringify(gangMembers),
-          "utf8",
-          function (err) {
-            if (err) {
-              console.log(
-                "An error occured while writing gangMembers.json to File"
-              );
-              return console.log(err);
-            }
-            console.log("gangMembers.json updated");
-            gmUpdated = currentDate(2);
-          }
-        );
+        fs.writeFileSync("./gangMembers.json", JSON.stringify(gangMembers), "utf8");
+        console.log("gangMembers.json updated");
+        gmUpdated = currentDate(2);
         console.log("GangMemberInfo has been run: " + gangMemberInfoCounter + " times");
         updateAllStats(gangMembers);
       });
