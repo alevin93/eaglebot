@@ -39,8 +39,6 @@ var gmUpdated = null;
 var startingAmount = 0;
 var splitFlag = false;
 var participants = [];
-var gangMemberLink =
-  "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
 
 // -------------- CRON JOBS ------------- //
 
@@ -933,6 +931,7 @@ var gangMemberInfoCounter = 0;
 
 const writeGangMemberInfo = async (gangInfo) => {
     gangMemberInfoCounter++;
+    let gangMemberLink = "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
     let gangInfoFile = gangInfo;
     if(!gangInfoFile.members) {
       let gangInfoFilef = fs.readFileSync('./gangInfo.json', 'utf8');
