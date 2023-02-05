@@ -528,7 +528,6 @@ const writeCaps = async () => {
     }
   );
   const json = await response.json().then((cartelInfo) => {
-    console.log(cartelInfo);
     if(gangInfo[2] === '<' || gangInfo[3] === '<' || gangInfo[1] === '<') { return; }
     if(gangInfo.message || gangInfo.error) { return; }
     fs.writeFile(
@@ -903,7 +902,6 @@ const writeGangInfo = async () => {
     }
   );
   const json = await response.json().then((gangInfo) => {
-    console.log(gangInfo);
     if(gangInfo[2] === '<' || gangInfo[3] === '<' || gangInfo[1] === '<') { return; }
     if(gangInfo.message || gangInfo.error) { return; }
     fs.writeFileSync(
