@@ -528,7 +528,6 @@ const writeCaps = async () => {
     }
   );
   const json = await response.json().then((cartelInfo) => {
-    console.log(cartelInfo);
     fs.writeFile(
       "cartelInfo.json",
       JSON.stringify(cartelInfo),
@@ -812,8 +811,7 @@ const endCap = (message) => {
   }
 
   var fields = [];
-  var numberParticipants = capsData.participating.length
-  console.log(message)
+  var numberParticipants = capsData.participating.length;
   if (numberParticipants === 0) { 
     numberParticipants = 1;
   }
@@ -859,7 +857,6 @@ const checkCaps = (cartelInfo) => {
         cartelFlag = true;
       }
     }
-    console.log(cartelFlag === false);
     if(cartelFlag === false) {
       endCap();
     }
@@ -904,7 +901,6 @@ const writeGangInfo = async () => {
   );
   const json = await response.json().then((gangInfo) => {
     if(Object.keys(gangInfo).length < 5) { return; }
-    console.log(gangInfo);
     fs.writeFileSync(
       "gangInfo.json",
       JSON.stringify(gangInfo),
@@ -955,7 +951,6 @@ const writeGangMemberInfo = async (gangInfo) => {
         },
       });
       const json = await response.json().then((gangMembers) => {
-        console.log(gangMembers);
         if(gangMembers?.message) { console.log("Limit of 250 a day reached for GangMembers Info"); return; }
         if(gangMembers?.error) { console.log("Invalid players something"); return; }
         fs.writeFileSync("./gangMembers.json", JSON.stringify(gangMembers), "utf8");
@@ -1025,97 +1020,97 @@ const archiveStats = () => {
 
 // ----------- IRON CHAT COMMANDS ------------------ //
 
-const checkIronLedger = (message) => {
-  var ironLedger = require('./ironLedger.json');
-  var fields = [];
-  for(let i = 0; i < ironLedger.length; i++) {
-    fields[i] =
-      {
-        name: `${ironLedger[i].name}`,
-        value: `${formatter.format(ironLedger[i].total_owed)}`,
-      }
-  }
-  const ironEmbed = new EmbedBuilder()
-      .setTitle("Iron Ledger")
-      .addFields(fields);
-    message.channel.send({ embeds: [ironEmbed] });
-}
+// const checkIronLedger = (message) => {
+//   var ironLedger = require('./ironLedger.json');
+//   var fields = [];
+//   for(let i = 0; i < ironLedger.length; i++) {
+//     fields[i] =
+//       {
+//         name: `${ironLedger[i].name}`,
+//         value: `${formatter.format(ironLedger[i].total_owed)}`,
+//       }
+//   }
+//   const ironEmbed = new EmbedBuilder()
+//       .setTitle("Iron Ledger")
+//       .addFields(fields);
+//     message.channel.send({ embeds: [ironEmbed] });
+// }
 
-const checkMemberLedger = (message, name) => {
-  var ironLedger = require('./ironLedger.json');
-  var transactions = "";
+// const checkMemberLedger = (message, name) => {
+//   var ironLedger = require('./ironLedger.json');
+//   var transactions = "";
   
-  for(let i = 0; i < ironLedger.length; i++) {
-    if(ironLedger[i].name.toLowerCase() === name) {
-      for(let j = 0; j < ironLedger[i].transactions.length; j++) {
-        transactions = transactions + ironLedger[i].transactions[j] + "\n"
-      }
-      const ironEmbed = new EmbedBuilder()
-      .setTitle(`${ironLedger[i].name}'s Ledger`)
-      .addFields(
-        {
-          name: "Name",
-          value: `${ironLedger[i].name}`
-        },
-        {
-          name: "Total Owed",
-          value: `${formatter.format(ironLedger[i].total_owed)}`
-        },
-        {
-          name: "Transactions",
-          value: `${transactions}`
-        }
-      )
-      .setFooter({
-        text: `Last Update: ${currentDate(2)}`,
-      });
-      message.channel.send({ embeds: [ironEmbed] });
-    }
-  }
+//   for(let i = 0; i < ironLedger.length; i++) {
+//     if(ironLedger[i].name.toLowerCase() === name) {
+//       for(let j = 0; j < ironLedger[i].transactions.length; j++) {
+//         transactions = transactions + ironLedger[i].transactions[j] + "\n"
+//       }
+//       const ironEmbed = new EmbedBuilder()
+//       .setTitle(`${ironLedger[i].name}'s Ledger`)
+//       .addFields(
+//         {
+//           name: "Name",
+//           value: `${ironLedger[i].name}`
+//         },
+//         {
+//           name: "Total Owed",
+//           value: `${formatter.format(ironLedger[i].total_owed)}`
+//         },
+//         {
+//           name: "Transactions",
+//           value: `${transactions}`
+//         }
+//       )
+//       .setFooter({
+//         text: `Last Update: ${currentDate(2)}`,
+//       });
+//       message.channel.send({ embeds: [ironEmbed] });
+//     }
+//   }
   
-}
+// }
 
 // ------------------------ TAX CALCULATION ------------------------//
 
-const calculateTax = () => {
-  const weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
-  const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
-  const taxed = JSON.parse(fs.readFileSync('./taxedStats.json','utf8'));
-  const before = JSON.parse(fs.readFileSync(`./archive/${weekCounter - 1}.json`));
+// const calculateTax = () => {
+//   const weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
+//   const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+//   const taxed = JSON.parse(fs.readFileSync('./taxedStats.json','utf8'));
+//   const before = JSON.parse(fs.readFileSync(`./archive/${weekCounter - 1}.json`));
  
-  const result = calculateStatistics(taxed, before, gangMembers);
+//   const result = calculateStatistics(taxed, before, gangMembers);
  
-  for(let i = 0; i < result.length; i++) {
-   for(var key in result.data) {
-     if(results[i].data[key] === 0) {
-       delete result[i].data[key];
-     }
-   }
-   if(Object.keys(result[i].data).length === 0) {
-     results[i].pop();
-   }
-  }
-  fs.writeFileSync('./taxStats.json', JSON.stringify(result), 'utf8');
- }
+//   for(let i = 0; i < result.length; i++) {
+//    for(var key in result.data) {
+//      if(results[i].data[key] === 0) {
+//        delete result[i].data[key];
+//      }
+//    }
+//    if(Object.keys(result[i].data).length === 0) {
+//      results[i].pop();
+//    }
+//   }
+//   fs.writeFileSync('./taxStats.json', JSON.stringify(result), 'utf8');
+//  }
  
- const updateTax = (taxed, stats) => {
-  const ledger = JSON.parse(fs.readFileSync('./ledger.json','utf8'));
-  for(let i = 0; i < stats.length; i++);
-    for(var x in stats[i].data) {
-      var rec = {}
-      if(ledger[stats[i].name]) {
-        rec = ledger[stats[i]]
-      } else {
-        rec = {
-          name: stats[i].name,
-          owed: null,
-          ledger: [],
-        }
-      }
-      rec.ledger
-    }
+//  const updateTax = (taxed, stats) => {
+//   const ledger = JSON.parse(fs.readFileSync('./ledger.json','utf8'));
+//   for(let i = 0; i < stats.length; i++);
+//     for(var x in stats[i].data) {
+//       var rec = {}
+//       if(ledger[stats[i].name]) {
+//         rec = ledger[stats[i]]
+//       } else {
+//         rec = {
+//           name: stats[i].name,
+//           owed: null,
+//           ledger: [],
+//         }
+//       }
+//       rec.ledger
+//     }
      
-}
+// }
 
 
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
