@@ -900,7 +900,8 @@ const writeGangInfo = async () => {
     }
   );
   const json = await response.json().then((gangInfo) => {
-    if(Object.keys(gangInfo).length < 5) { return; }
+    if(gangInfo[3] === '<') { return; }
+    if(gangInfo.message || gangInfo.error) { return; }
     fs.writeFileSync(
       "gangInfo.json",
       JSON.stringify(gangInfo),
