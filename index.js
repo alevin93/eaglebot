@@ -528,6 +528,7 @@ const writeCaps = async () => {
     }
   );
   const json = await response.json().then((cartelInfo) => {
+    console.log(cartelInfo);
     fs.writeFile(
       "cartelInfo.json",
       JSON.stringify(cartelInfo),
@@ -903,6 +904,7 @@ const writeGangInfo = async () => {
   );
   const json = await response.json().then((gangInfo) => {
     if(Object.keys(gangInfo).length < 5) { return; }
+    console.log(gangInfo);
     fs.writeFileSync(
       "gangInfo.json",
       JSON.stringify(gangInfo),
@@ -912,8 +914,6 @@ const writeGangInfo = async () => {
           console.log("An error occured while writing JSON to File");
           return console.log(err);
         }
-        gangMemberLink =
-          "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
         console.log("gangInfo.json updated");
       }
     );
@@ -934,7 +934,7 @@ const writeGangMemberInfo = async (gangInfo) => {
     let gangMemberLink = "https://stats.olympus-entertainment.com/api/v3.0/players/?player_ids=";
     let gangInfoFile = gangInfo;
     if(!gangInfoFile.members) {
-      let gangInfoFilef = fs.readFileSync('./gangInfo.json', 'utf8');
+      let gangInfoFile = fs.readFileSync('./gangInfo.json', 'utf8');
     }
 
     
@@ -1109,14 +1109,10 @@ const calculateTax = () => {
         rec = {
           name: stats[i].name,
           owed: null,
-          ledger: {},
+          ledger: [],
         }
       }
-      for(let j = 0; j < taxed.length; j++) {
-        if(rec.data[taxed[i].name]) {
-          rec.data[taxed]
-        }
-      }
+      rec.ledger
     }
      
 }
@@ -1445,7 +1441,7 @@ const validateFiles = () => {
     console.log("No taxed file found!");
   }
   if(!taxed) {
-    fs.writeFileSync('./taxedStats.json', JSON.stringify([{ name: 'iron_sold', tax: 1900 }]), 'utf8');
+    fs.writeFileSync('./taxedStats.json', JSON.stringify([{ name: 'iron_sold', tax: 190 }]), 'utf8');
   }
   var ledger = null;
   try {
