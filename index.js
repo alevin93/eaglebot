@@ -528,7 +528,7 @@ const writeCaps = async () => {
     }
   );
   const json = await response.json().then((cartelInfo) => {
-    if(gangInfo[2] === '<' || gangInfo[3] === '<' || gangInfo[1] === '<') { return; }
+    if(cartelInfo[2] === '<' || cartelInfo[3] === '<' || cartelInfo[1] === '<') { return; }
     if(gangInfo.message || gangInfo.error) { return; }
     fs.writeFile(
       "cartelInfo.json",
