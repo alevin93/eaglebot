@@ -36,6 +36,7 @@ const prefix = "!";
 
 var giUpdated = null;
 var gmUpdated = null;
+var ledgerUpdated = null;
 var startingAmount = 0;
 var splitFlag = false;
 var participants = [];
@@ -120,16 +121,21 @@ client.on("messageCreate", (message) => {
   if (command[0] === "endcap") {
     endCap(message);
   }
-  // if (command[0] === "iron") {
+  // if (command[0] === 'ledger') {
   //   if(command[1]) {
-  //     checkMemberLedger(message, command[1]);
+  //     var playerName = "";
+  //     for(let i = 1; i < command.length; i++) {
+  //       playerName = `${playerName}` + `${command[i]}`;
+  //     }
+  //     getMemberLedger(message, playerName)
   //   }
   //   else {
-  //     checkIronLedger(message);
+  //     getLedger(message);
   //   }
   // }
+  // }
   if (command[0] === "test") {
-    
+    //calculateTax();
   }
   // if (command[0] === "fetch"){
   //   writeGangInfo();
@@ -140,10 +146,67 @@ client.on("messageCreate", (message) => {
   // }
 });
 
+// -------------- GET LEDGER FUNCTIONS ------------ //
+
+const getLedger = (message) => {
+  const ledger = JSON.parse(fs.readFileSync('./ledger.json', 'utf8'));
+  var fields = [];
+  var index = 0;
+  for(var player in ledger) {
+    fields[index] = {
+      name: `${player}`,
+      value: '```'+`${formatter.format(ledger[player].owed)}`+'```',
+      inline: true
+    }
+    index++;
+    if(index > 25) {break;}
+  }
+  const ledgerEmb = new EmbedBuilder()
+    .setTitle("Current Taxes Owed")
+    .addFields(fields)
+    .setColor(0x03fc0b)
+    .setFooter({
+      text: `Last Update: ${ledgerUpdated}`,
+    });
+  console.log("getLedger run");
+  message.channel.send({ embeds: [ledgerEmb] });
+}
+
+const getMemberLedger = (message, playerName) => {
+  const ledger = JSON.parse(fs.readFileSync('./ledger.json', 'utf8'));
+  fields = [];
+  var indexName = null
+  for(var player in ledger) {
+    if(player.toLowerCase().replace(/\s/g, '') === playerName) {
+      indexName = player;
+    }
+  }
+  for(let i = ledger[indexName].ledger.length - 1; i > ledger[indexName].ledger.length - 5; i--) {
+    if(i < 0) { continue; }
+    fields[fields.length] = {
+      name: ' ',
+      value: `${ledger[indexName].ledger[i]}`
+    }
+  }
+  const ledgerEmb = new EmbedBuilder()
+    .setTitle(`${indexName}'s Tax Ledger`)
+    .addFields(
+      {
+        name: "Amount Owed",
+        value: '```' + `${formatter.format(ledger[indexName].owed)}` + '```',
+      }
+    )
+    .addFields(fields)
+    .setColor(0x106119)
+    .setFooter({
+      text: `Last Update: ${ledgerUpdated}`,
+    });
+  console.log("get Member Ledger run");
+  message.channel.send({ embeds: [ledgerEmb] });
+}
+
 //----------- GANG FUNCTION ------------ //
 const gangEmbed = (message) => {
-  //delete require.cache[require.resolve('./gangInfo.json')];
-  //let gangInfoFile = require('./gangInfo.json');
   fs.readFile('./gangInfo.json', 'utf8', (err, gangInfoFile) => {
     if (err) {
        console.log(err);
@@ -1075,45 +1138,74 @@ const archiveStats = () => {
 
 // ------------------------ TAX CALCULATION ------------------------//
 
-// const calculateTax = () => {
-//   const weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
-//   const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
-//   const taxed = JSON.parse(fs.readFileSync('./taxedStats.json','utf8'));
-//   const before = JSON.parse(fs.readFileSync(`./archive/${weekCounter - 1}.json`));
+const calculateTax = () => {
+  const weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json','utf8'));
+  const gangMembers = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
+  const taxed = JSON.parse(fs.readFileSync('./taxedStats.json','utf8'));
+  const before = JSON.parse(fs.readFileSync(`./archive/${weekCounter - 1}.json`));
+
+  let taxKeys = []
+
+  for(let i = 0; i < taxed.length; i++) {
+    taxKeys[i] = taxed[i].name;
+  }
  
-//   const result = calculateStatistics(taxed, before, gangMembers);
+  const result = calculateStatistics(taxKeys, before, gangMembers);
+  for(let i = 0; i < result.length; i++) {
+    if(!result[i]) { continue; }
+   for(var key in result[i].data) {
+     if(result[i].data[key] === 0) {
+       delete result[i].data[key];
+     }
+   }
+   if(Object.keys(result[i].data).length === 0) {
+     result.splice(i, 1);
+   }
+  }
+  fs.writeFileSync('./taxStats.json', JSON.stringify(result), 'utf8');
+  updateTax(taxed, result);
+ }
  
-//   for(let i = 0; i < result.length; i++) {
-//    for(var key in result.data) {
-//      if(results[i].data[key] === 0) {
-//        delete result[i].data[key];
-//      }
-//    }
-//    if(Object.keys(result[i].data).length === 0) {
-//      results[i].pop();
-//    }
-//   }
-//   fs.writeFileSync('./taxStats.json', JSON.stringify(result), 'utf8');
-//  }
- 
-//  const updateTax = (taxed, stats) => {
-//   const ledger = JSON.parse(fs.readFileSync('./ledger.json','utf8'));
-//   for(let i = 0; i < stats.length; i++);
-//     for(var x in stats[i].data) {
-//       var rec = {}
-//       if(ledger[stats[i].name]) {
-//         rec = ledger[stats[i]]
-//       } else {
-//         rec = {
-//           name: stats[i].name,
-//           owed: null,
-//           ledger: [],
-//         }
-//       }
-//       rec.ledger
-//     }
-     
-// }
+ const updateTax = (taxed, stats) => {
+  const ledger = JSON.parse(fs.readFileSync('./ledger.json','utf8'));
+  console.log(stats);
+  for(let i = 0; i < stats.length; i++) {
+    var rec = {}
+    if(ledger[stats[i]] === null) { continue; }
+    if(!stats[i]) { continue; }
+    console.log(stats[i].name);
+    if(ledger[stats[i].name]) {
+      rec = ledger[stats[i].name]
+    } else {
+      rec = {
+        name: stats[i].name,
+        owed: 0,
+        ledger: [],
+      }
+    }
+    var thisWeek = `*Week of ${currentDate(1)}:*`;
+    var thisWeekOwed = 0;
+    for(let j = 0; j < Object.keys(stats[i].data).length; j++) {
+      if(stats[i].data[taxed[j].name] === null) { continue; } 
+      if(stats[i].data[taxed[j].name] === 0) { continue; }
+      if(stats[i].data[taxed[j].name] === undefined) { continue; }
+        thisWeek = thisWeek + `\n• **${stats[i].data[taxed[j].name].toLocaleString("en-US")} ${taxed[j].name.replace(/_/g, ' ')}**` + ' Total tax is ' + `**${formatter.format(stats[i].data[taxed[j].name]*taxed[j].tax)}**`;
+        thisWeekOwed = thisWeekOwed + (stats[i].data[taxed[j].name]*taxed[j].tax);
+    }
+    thisWeek = thisWeek + `\n Balance: **${formatter.format(rec.owed + thisWeekOwed)}**`;
+    rec.ledger.push(thisWeek);
+    rec.owed = rec.owed + thisWeekOwed;
+
+    if(rec.owed > 0) {
+      ledger[stats[i].name] = rec
+    } else {
+      delete ledger[stats[i].name];
+    }
+  }
+    
+  fs.writeFileSync('./ledger.json', JSON.stringify(ledger), 'utf8')
+  ledgerUpdated = currentDate(1);
+}
 
 
 // ----------- STATISTICS CALCULATION FUNCTIONS ------------- //
@@ -1283,7 +1375,7 @@ const currentDate = (num) => {
         }
         var date = (currentdate.getMonth()+1) + "/"
                   + currentdate.getDate() + "/" 
-                  + currentdate.getYear();
+                  + currentdate.getFullYear();
         return date;
   }
 }
@@ -1448,7 +1540,7 @@ const validateFiles = () => {
     console.log("No taxed stats file found");
   }
   if(!ledger) {
-    fs.writeFileSync('./ledger.json', JSON.stringify([]), 'utf8')
+    fs.writeFileSync('./ledger.json', JSON.stringify({}), 'utf8')
   }
 }
 
