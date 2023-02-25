@@ -69,7 +69,7 @@ client.on("messageCreate", (message) => {
   const command = temp.split(" ")
 
   if (command[0] === "check") {
-    console.log(message);
+    console.log(message.member);
   }
   if (command[0] === "caps") {
     getCaps(message);
@@ -137,13 +137,13 @@ client.on("messageCreate", (message) => {
   if (command[0] === "test") {
     //calculateTax();
   }
-  // if (command[0] === "fetch"){
-  //   writeGangInfo();
-  //  }
-  // if(command[0] === 'archive') {
-  //   recordWeekStats();
-  //   archiveStats();
-  // }
+  if (command[0] === "fetch"){
+    writeGangInfo();
+   }
+  if(command[0] === 'archive') {
+    recordWeekStats();
+    archiveStats();
+  }
 });
 
 // -------------- GET LEDGER FUNCTIONS ------------ //
@@ -213,7 +213,7 @@ const gangEmbed = (message) => {
     }
     else {
     const statsEmbed = new EmbedBuilder()
-      .setTitle("Comp Or Ban")
+      .setTitle("Screaming Eagles")
       .setThumbnail("https://i.imgur.com/BHLmQck.jpeg")
       .setURL("https://stats.olympus-entertainment.com/#/stats/gangs/25546")
       .addFields(
@@ -303,7 +303,7 @@ const getWeeklyStats = (message) => {
     if(!json[tracked[i]]) { continue; }
     fields[i] = {
       name: `${tracked[i].toUpperCase().replace('_',' ')}`,
-      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank' || tracked[i] === "ticket_vals"? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
+      value: `${json[tracked[i]].name}` + '```' +  `${tracked[i] === 'bank' || tracked[i] === "ticket_vals" || tracked[i] === 'bets_won_value'? formatter.format(json[tracked[i]].value) : json[tracked[i]].value}` + '```',
       inline: true
     }
   }
@@ -462,17 +462,16 @@ const editTracked = async (message, command, stat) => {
       statList.push(`${Object.keys(gangMemberFile[0].stats)[i]}`); 
     }
     if(command === 'options') {
-      for(let i = 0; i < Object.keys(gangMemberFile[0]).length; i++) {
-        statList.push('`' + `${Object.keys(gangMemberFile[0])[i]}` + '` - ');
-      }
-      for(let i = 0; i < Object.keys(gangMemberFile[0].stats).length; i++) {
-        statList.push('`' + `${Object.keys(gangMemberFile[0].stats)[i]}` + '` - '); 
-      }
       var optionList = '';
       for(let i = 0; i < statList.length; i++) {
-        optionList = optionList + statList[i];
+        optionList = optionList + '`' + statList[i] + '` - ';
       }
-      message.channel.send(optionList);
+      const half = Math.ceil(optionList.length / 2);
+      const firstOptions = optionList.slice(0,half);
+      const secondOptions = optionList.slice(half);
+      message.author.send(firstOptions);
+      message.author.send(secondOptions);
+
     }
     let tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
     let foundFlag = false;
@@ -515,7 +514,7 @@ const editTracked = async (message, command, stat) => {
     updateAllStats(gangMemberFile);
   }
   else {
-    message.channel.send("Access denied!  Ask Slyr.");
+    message.channel.send("Access denied!  Ask the leaders.");
   }
 }
 
@@ -524,31 +523,27 @@ const removeRecord = async (stat) => {
   let leaders = JSON.parse(fs.readFileSync('./weeklyLeaders.json', 'utf8'));
   let archive = JSON.parse(fs.readFileSync('./recordsArchive.json', 'utf8'));
 
-  if(archive[stat]) {
+  if(archive[stat]  && leaders[stat]) {
     if(archive[stat].value < leaders[stat].record) {
       archive[stat].value = leaders[stat].record;
       archive[stat].name = leaders[stat].holder;
     }
   } else {
-    rec = {
-      'name': `${leaders[stat].name}`,
-      'value': `${leaders[stat].record}`
+    if(leaders[stat]) {
+      rec = {
+        'name': `${leaders[stat].name}`,
+        'value': `${leaders[stat].record}`
+      }
+      archive[stat] = rec;
     }
-    archive[stat] = rec;
   }
-  delete leaders[stat];
-  fs.writeFile(
+  if(leaders[stat]) {
+    delete leaders[stat];
+  }
+  fs.writeFileSync(
     "weeklyLeaders.json",
     JSON.stringify(leaders),
-    "utf8",
-    function (err) {
-      if (err) {
-        console.log("An error occured while removing item from leaders file");
-        return console.log(err);
-      }
-      console.log("Leaders file updated!")
-    }
-  );
+    "utf8");
   fs.writeFileSync(
     "recordsArchive.json",
     JSON.stringify(archive),
@@ -586,7 +581,7 @@ const writeCaps = async () => {
       headers: {
         accept: "application/json",
         Authorization:
-          "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
+          process.env.OLYMPUS_TOKEN,
       },
     }
   );
@@ -773,6 +768,7 @@ const startCap = (message) => {
   let gangInfo = JSON.parse(fs.readFileSync('./gangInfo.json'), 'utf8');
   let oldCapsData = JSON.parse(fs.readFileSync('./capsData.json', 'utf8'));
   if(oldCapsData.startAmount || oldCapsData.startTime) { message.channel.send('Theres already a cap going on.  Join that one by reacting to the emote.'); return; }
+  participants = [];
 
   var capsData = {
     startTime: currentDate(2),
@@ -797,12 +793,12 @@ const startCap = (message) => {
 
     client.on('messageReactionAdd', (reaction, user) => {
       if(user.id === emb.author) {return;}
-      if(user.username === 'FloppaBot') { return; }
+      if(user.username === 'Screaming Eagle') { return; }
       var fields = [];
-      participants.push(user.username);
-      for(let i = 0; i < participants.length; i++) {
+      capsData.participating.push(user.username);
+      for(let i = 0; i < capsData.participating.length; i++) {
         fields[i] = {
-          name: participants[i],
+          name: capsData.participating[i],
           value: " ",
           inline: true
         }
@@ -817,11 +813,10 @@ const startCap = (message) => {
       .setFooter({ text: "React to this if you're joining"})
       .addFields(fields)
 
-      capsData.participating.push(user.username);
-
       fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8' );
 
       emb.edit({ embeds: [newEmb]});
+      newEmb = null;
     })
     client.on('messageReactionRemove', (reaction, user) => {
       var temp = []
@@ -829,20 +824,17 @@ const startCap = (message) => {
       var fields = [];
       if(user.id === emb.author) {return;}
       if(user.username === 'FloppaBot') { return; }
-      for(let i = 0; i < participants.length; i++) {
-        if(user.username === participants[i]) {
+      for(let i = 0; i < capsData.participating.length; i++) {
+        if(user.username === capsData.participating[i]) {
           index = i;
         } else {
           fields[i] = {
-            name: participants[i],
+            name: capsData.participating[i],
             value: " ",
             inline: true
           }
-          temp[i] = participants[i];
+          temp[i] = capsData.participating[i];
         }
-      }
-      if(index !== null) {
-        participants.splice(index, 1);
       }
       capsData.participating = temp;
 
@@ -859,6 +851,7 @@ const startCap = (message) => {
       fs.writeFileSync('./capsData.json', JSON.stringify(capsData), 'utf8');
 
       emb.edit({ embeds: [newEmb]});
+      newEmb = null;
     })
   })
 }
@@ -955,12 +948,12 @@ var gangInfoFlag = true;
 
 const writeGangInfo = async () => {
   const response = await fetch(
-    "https://stats.olympus-entertainment.com/api/v3.0/gangs/25546/",
+    "https://stats.olympus-entertainment.com/api/v3.0/gangs/36940/",
     {
       headers: {
         accept: "application/json",
         Authorization:
-          "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
+          process.env.OLYMPUS_TOKEN,
       },
     }
   );
@@ -1013,7 +1006,7 @@ const writeGangMemberInfo = async (gangInfo) => {
         headers: {
           accept: "application/json",
           Authorization:
-            "Token g948_Qmi9EuhOzkzD6GAO_saloZ4lmcb3M3pYD6CUB4tPHCBivvDYuooVlSzbNxk",
+            process.env.OLYMPUS_TOKEN,
         },
       });
       const json = await response.json().then((gangMembers) => {
@@ -1228,6 +1221,7 @@ const recordWeekStats = () => {
     }    
   );
   for(let i = 0; i < tracked.length; i++) {
+    if(!leaders[[tracked[i]]]) { continue; }
     if(archive[tracked[i]]) {
       if(archive[tracked[i]].value < leaders[tracked[i]].record) {
         archive[tracked[i]].value = leaders[tracked[i]].record;
