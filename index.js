@@ -260,6 +260,10 @@ const helpMessage = (message) => {
     .addFields(
       { name: "!gang", value: "Returns information on the gang." },
       {
+        name: "!gang roster",
+        value: "Returns list of current names in the gang (the bot mostly uses steam ID so if you change profiles it may be under that name)"
+      },
+      {
         name: "!caps",
         value:
           "Displays cartel status, which gang owns them, and what percentage they hold.",
@@ -267,7 +271,7 @@ const helpMessage = (message) => {
       {
         name: "!startcap",
         value:
-          "Starts recording gang funds. React with the 👍 to the user who started the cap process to enter your split. ",
+          "Starts recording gang funds. Add a react add yourself to the split. ",
       },
       {
         name: "!endcap",
@@ -282,11 +286,27 @@ const helpMessage = (message) => {
       {
         name: "!stats [player name]",
         value:
-          "Gives the named players currently tracked stats.  Make sure you spell their name right."
+          "Gives the named players weekly value of currently tracked stats.  Make sure you spell their name right."
+      },
+      {
+        name: "stats overall [player name]",
+        value: "gives total stats for that player (that are tracked currently"
+      },
+      {
+        name: "!record",
+        value: "gives the one week record for the currently tracked stats (any stats tracked at the time are saved if they become tracked again)"
+      },
+      {
+        name: "!stats options",
+        value:"returns a list of possible stats to track"
+      },
+      {
+        name: "!last",
+        value: "returns last weeks highest stats (that are tracked)"
       }
     )
     .setFooter({
-      text: "Please submit bug reports to Nman#3327 on discord, or tag @FloppaDev",
+      text: "Please submit bug reports to Crux#2045",
     });
   message.author.send({ embeds: [helpEmbed] });
 };
@@ -451,7 +471,7 @@ const getTotalStats = (message, command) => {
 }
 
 const editTracked = async (message, command, stat) => {
-  if(message.author.id === '288445122947973121' || message.author.id === slayer_id) {
+  if(message.member._roles.includes('983976426275495997')) {
     let weekCounter = JSON.parse(fs.readFileSync('./weekCounter.json', 'utf8'));
     let gangMemberFile = JSON.parse(fs.readFileSync('./gangMembers.json', 'utf8'));
     var statList = [];
@@ -464,14 +484,14 @@ const editTracked = async (message, command, stat) => {
     if(command === 'options') {
       var optionList = '';
       for(let i = 0; i < statList.length; i++) {
-        optionList = optionList + '`' + statList[i] + '` - ';
+        optionList = optionList + '`' + statList[i] + '`/';
       }
-      const half = Math.ceil(optionList.length / 2);
-      const firstOptions = optionList.slice(0,half);
-      const secondOptions = optionList.slice(half);
-      message.author.send(firstOptions);
-      message.author.send(secondOptions);
-
+      // const half = Math.ceil(optionList.length / 2);
+      // const firstOptions = optionList.slice(0,half);
+      // const secondOptions = optionList.slice(half);
+      // message.author.send(firstOptions);
+      // message.author.send(secondOptions);
+      message.author.send(optionList);
     }
     let tracked = JSON.parse(fs.readFileSync('./trackedStats.json', 'utf8'));
     let foundFlag = false;
